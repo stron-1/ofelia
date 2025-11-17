@@ -1,0 +1,61 @@
+/* Importar fuentes desde Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Lato:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
+
+/* --- VARIABLES GLOBALES DEL TEMA (COLORES INSTITUCIONALES) --- */
+:root {
+  /* Paleta de Colores */
+  --color-primary: #014ba0;      /* Azul Institucional (Nuevo) */
+  --color-accent: #efb810;       /* Dorado/Acento (Nuevo) */
+  --color-background: #FDFBF7;   /* Almendra (Fondo - Puedes mantenerlo o cambiarlo a #FFFFFF) */
+  --color-text: #4E4E4E;         /* Carbón (Texto) */
+  --color-white: #FFFFFF;
+
+  /* Tipografía */
+  --font-heading: 'Montserrat', sans-serif;
+  --font-body: 'Lato', sans-serif;
+}
+/* ------------------------------------ */
+
+/* Estilos base y reseteo */
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-smoothing: grayscale;
+}
+
+/* Estilos para el contenido principal y las páginas */
+.main-content {
+  min-height: calc(100vh - 140px);
+  padding: 2rem 1rem;
+}
+
+/* Contenedor general para centrar contenido */
+.page-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+}
+
+/* Estilos base para los títulos */
+h1, h2, h3 {
+  font-family: var(--font-heading);
+  color: var(--color-primary); /* <-- Usará el nuevo azul */
+}
+
+h1 {
+  border-bottom: 3px solid var(--color-accent); /* <-- Usará el nuevo dorado */
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+p {
+  line-height: 1.7;
+}
+
+ul {
+  line-height: 1.8;
+}

@@ -1,0 +1,116 @@
+/* --- Fondo --- */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* --- Contenido --- */
+.modalContent {
+  background-color: var(--color-white);
+  padding: 2rem 3rem;
+  border-radius: 12px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 450px;
+  position: relative; /* Para posicionar el botón de cerrar */
+  z-index: 1001;
+}
+
+.modalContent h2 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: var(--color-primary);
+}
+
+/* --- Formulario --- */
+/* (Estilos similares a los de ContactoPage) */
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.formGroup input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+}
+
+.formGroup input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(1, 75, 160, 0.2);
+}
+
+/* --- Botón de Envío --- */
+.submitBtn {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 8px;
+  /* Usamos los colores del colegio */
+  background-color: var(--color-primary); 
+  color: var(--color-white); 
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submitBtn:hover {
+  background-color: #013a7c; /* Azul un poco más oscuro */
+}
+
+/* --- Botón de Cerrar (X) --- */
+.closeBtn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 2.5rem;
+  color: #aaa;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+.closeBtn:hover {
+  color: var(--color-text);
+}
+
+/* --- Mensajes --- */
+.errorMessage {
+  color: #D8000C;
+  background-color: #FFD2D2;
+  padding: 0.8rem;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.successMessage {
+  color: #4F8A10;
+  background-color: #DFF2BF;
+  padding: 0.8rem;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 1rem;
+}

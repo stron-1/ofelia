@@ -1,0 +1,174 @@
+/* Animación simple de entrada */
+.infoPageContainer {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* --- 1. BARRA DE NAVEGACIÓN (NUEVO) --- */
+.pageNavigation {
+  display: flex;
+  flex-wrap: wrap; /* Para móviles */
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+/* Estilo del enlace "Volver" (Modificado) */
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--color-primary);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 0; /* Ya no es necesario */
+}
+.backLink:hover {
+  text-decoration: underline;
+}
+
+/* Estilo del enlace "Contextual" (Nuevo) */
+.contextLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--color-accent); /* Color de acento */
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.contextLink:hover {
+  text-decoration: underline;
+}
+/* ------------------------------------- */
+
+/* 2. Estilo del Encabezado (Título y Párrafo) */
+.contentHeader {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid var(--color-accent);
+}
+.contentHeader h1 {
+  /* ... (resto de estilos sin cambios) ... */
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: var(--color-primary);
+  font-size: 2.5rem;
+}
+.contentHeader p {
+  /* ... (resto de estilos sin cambios) ... */
+  font-size: 1.15rem;
+  max-width: 700px;
+  margin: 0 auto;
+  color: var(--color-text);
+  line-height: 1.7;
+}
+
+/* 3. Estilos de Secciones */
+.scheduleSection,
+.propuestaSection {
+  margin-bottom: 2.5rem;
+}
+
+.scheduleSection h2,
+.propuestaSection h2 {
+  /* ... (resto de estilos sin cambios) ... */
+  font-family: var(--font-heading);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+/* Estilo de las "Tarjetas" de Horario */
+.scheduleGrid {
+  /* ... (resto de estilos sin cambios) ... */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+.scheduleCard {
+  /* ... (resto de estilos sin cambios) ... */
+  background: var(--color-white);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-top: 5px solid var(--color-primary);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.scheduleCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+.scheduleCard h3 {
+  /* ... (resto de estilos sin cambios) ... */
+  margin: 0 0 0.5rem 0;
+  font-family: var(--font-heading);
+  color: var(--color-text);
+  font-size: 1.1rem;
+}
+.scheduleTime {
+  /* ... (resto de estilos sin cambios) ... */
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0;
+  font-family: var(--font-heading);
+}
+
+/* 4. Sección extra (Propuesta) */
+.propuestaSection {
+  /* ... (resto de estilos sin cambios) ... */
+  background: var(--color-white);
+  padding: 2rem 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+.propuestaSection ul {
+  padding-left: 20px;
+  line-height: 1.8;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 600px) {
+  .contentHeader h1 {
+    font-size: 2rem;
+  }
+  /* Hacemos que los links ocupen todo el ancho en móvil */
+  .pageNavigation {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .backLink, .contextLink {
+    justify-content: center;
+    padding: 0.5rem;
+  }
+  .contextLink {
+    background: #fdfdfd;
+    border-radius: 8px;
+    border: 1px solid #eee;
+  }
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

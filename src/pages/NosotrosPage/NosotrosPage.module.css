@@ -1,0 +1,105 @@
+/* --- SECCIÓN MISIÓN Y VISIÓN --- */
+.mvvSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.mvvCard {
+  background-color: var(--color-white);
+  padding: 2.5rem;
+  border-radius: 12px; 
+  /* 'border-top' y 'box-shadow' están quitados, lo cual es correcto */
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-height: 280px; 
+}
+
+.mvvCard h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.mvvIcon {
+  font-size: 3.5rem;
+  /* 1. COLOR DE ICONO AMARILLO (Confirmado) */
+  color: var(--color-accent); 
+  margin-bottom: 1.5rem;
+}
+
+/* --- SECCIÓN VALORES --- */
+.valoresSection h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* 2. CAMBIO A GRID 2x2 */
+.valoresGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* <-- 2 columnas */
+  gap: 1.5rem;
+  
+  /* Para que se vea "bien organizado" en pantallas anchas */
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ESTILOS DE VALORES (Confirmados) */
+.valorCard {
+  background-color: var(--color-white);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* <-- Sombra restaurada */
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; 
+  min-height: 220px; 
+}
+
+.valorCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.valorIcon {
+  font-size: 3rem;
+  /* 1. COLOR DE ICONO AMARILLO (Confirmado) */
+  color: var(--color-accent);
+  margin-bottom: 1rem;
+}
+
+.valorTitle {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--color-primary);
+  font-size: 1.25rem;
+  margin-top: 0;
+  margin-bottom: 0.75rem; 
+}
+
+.valorDescription {
+  font-size: 0.95rem;
+  color: var(--color-text);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .mvvSection {
+    grid-template-columns: 1fr;
+  }
+  
+  /* 2. CAMBIO A GRID 2x2 (Móvil) */
+  .valoresGrid {
+    grid-template-columns: 1fr; /* <-- 1 columna en móvil */
+  }
+}

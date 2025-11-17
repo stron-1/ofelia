@@ -1,0 +1,112 @@
+.heroSection {
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: var(--color-white); 
+  color: var(--color-primary);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.heroContent h1 {
+  color: var(--color-primary);
+  font-size: 2.8rem;
+  border-bottom: none;
+  margin-bottom: 1rem;
+}
+
+.heroContent p {
+  font-size: 1.2rem;
+  max-width: 700px;
+  margin: 0 auto;
+  color: var(--color-text); 
+  margin-bottom: 2.5rem;
+}
+
+.ctaButton {
+  display: inline-block;
+  padding: 0.9rem 2.2rem;
+  background-color: var(--color-accent); /* Fondo dorado */
+  color: var(--color-primary); /* Texto azul */
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.ctaButton:hover {
+  background-color: #d6a40e; /* Dorado más oscuro */
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.welcomeSection,
+.whyUsSection {
+  padding: 0 0 2rem 0;
+}
+
+.whyUsSection {
+  padding-top: 1rem;
+}
+
+.directorMessage {
+  background-color: var(--color-white);
+  border-left: 6px solid var(--color-accent);
+  padding: 1.5rem 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.directorMessage strong {
+  color: var(--color-primary);
+}
+
+/* --- SECCIÓN "POR QUÉ ELEGIRNOS" (Actualizada) --- */
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.featureCard {
+  background-color: var(--color-white);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  /* Lo convertimos en flexbox para alinear el contenido */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.featureCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* --- NUEVOS ESTILOS: Para el contenido de las tarjetas --- */
+.featureIcon {
+  font-size: 3rem; /* Icono grande */
+  color: var(--color-accent); /* Icono dorado */
+  margin-bottom: 1rem;
+}
+
+.featureTitle {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--color-primary);
+  font-size: 1.25rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.featureDescription {
+  font-size: 0.95rem;
+  color: var(--color-text);
+  line-height: 1.6;
+  margin: 0;
+}

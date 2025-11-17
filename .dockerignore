@@ -1,0 +1,14 @@
+# Ignorar las dependencias de Node.js del host
+node_modules
+
+# Ignorar la carpeta de la base de datos
+postgres-data
+
+# Ignorar el directorio de build (si existe)
+dist
+
+# Ignorar la configuración de git
+.git
+
+# Ignorar la carpeta del backend
+backend/

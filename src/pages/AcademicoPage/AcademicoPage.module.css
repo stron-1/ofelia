@@ -1,0 +1,135 @@
+.introParagraph {
+  font-size: 1.1rem;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 3rem auto;
+  color: var(--color-text);
+}
+
+/* --- SECCIÓN Carpetas Académicas --- */
+.folderSection {
+  margin-bottom: 4rem;
+}
+
+.folderSection h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.folderIntro {
+  font-size: 1.1rem;
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 3rem auto;
+  color: var(--color-text);
+}
+
+.folderGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  justify-items: center;
+  /* Espacio extra superior para que la hoja no tape el título */
+  padding: 5rem 0;
+}
+
+.folderWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Espacio entre la carpeta y su título H3 */
+  gap: 2.5rem; 
+}
+
+.folderTitle {
+  font-family: var(--font-heading);
+  color: var(--color-primary);
+  font-size: 1.25rem;
+  text-align: center;
+  margin: 0;
+}
+
+/* --- SECCIÓN METODOLOGÍA (SE MANTIENE IGUAL) --- */
+.metodologiaSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  align-items: center;
+  background-color: var(--color-white);
+  padding: 3rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.metodologiaContent h2 {
+  margin-top: 0;
+  text-align: left;
+}
+
+.metodologiaContent p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+.metodologiaImage {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.metodologiaImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* --- Responsive (Ajustado) --- */
+@media (max-width: 992px) {
+  .metodologiaSection {
+    grid-template-columns: 1fr;
+  }
+  
+  .folderGrid {
+    grid-template-columns: 1fr;
+    gap: 4rem; 
+    padding: 3rem 0; /* Menos padding superior en móvil */
+  }
+}
+
+/* * --- (NUEVOS) ESTILOS PARA LAS HOJAS (LINKS) --- 
+ * (Reemplazan a .paperContent, .paperList, etc.)
+*/
+.paperLink {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem; /* Espacio entre icono y texto */
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem;
+  text-decoration: none;
+  color: var(--color-primary);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  text-align: center;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+/* Efecto al pasar el mouse sobre la hoja */
+.paperLink:hover {
+  transform: scale(1.1);
+  color: var(--color-accent);
+}
+
+.paperIcon {
+  font-size: 1rem; /* Icono grande */
+  line-height: 1;
+}
+
+.paperTitle {
+  font-size: 0.6rem; /* Texto pequeño pero legible */
+  line-height: 1;
+}

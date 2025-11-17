@@ -1,0 +1,179 @@
+/* 1. Contenedor principal (Flexbox) */
+.dashboardContainer {
+  display: flex;
+  min-height: 100vh;
+  /* Usamos un fondo gris claro para el área de contenido */
+  background-color: #f4f7fa; 
+}
+
+/* 2. Sidebar (definido en DashboardPage.tsx) */
+.sidebar {
+  /* Añade esto para que el botón de logout se vaya al fondo */
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-primary); 
+  color: var(--color-white);
+  flex-shrink: 0;
+  transition: width 0.3s ease-in-out;
+  overflow-x: hidden;
+}
+
+/* Estado abierto */
+.sidebar.open {
+  width: 250px;
+}
+/* Estado colapsado */
+.sidebar.closed {
+  width: 80px;
+}
+
+.logoArea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 0;
+  /* Usamos la fuente de títulos de global.css */
+  font-family: var(--font-heading); 
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.navMenu {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-family: var(--font-body); /* */
+  font-weight: 700;
+  transition: all 0.3s ease;
+  white-space: nowrap; /* Evita que el texto se parta */
+}
+
+/* Centra los íconos cuando está colapsado */
+.closed .navLink {
+  justify-content: center;
+  padding: 1rem;
+}
+
+.navLink:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--color-white);
+}
+
+/* Estilo del link activo (usando el acento dorado) */
+.navLink.active {
+  background-color: var(--color-accent); 
+  color: var(--color-primary); /* */
+}
+
+.navLink .material-symbols-outlined {
+  font-size: 1.8rem;
+  min-width: 24px; /* Asegura alineación */
+}
+
+.linkText {
+  margin-left: 1rem;
+}
+
+/* 3. Área Principal (Header + Contenido) */
+.mainArea {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 4. Header */
+.header {
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  height: 70px;
+  background-color: var(--color-white);
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.toggleBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text); /* Color texto */
+  margin-right: 1rem;
+}
+.toggleBtn .material-symbols-outlined {
+  font-size: 2rem;
+  vertical-align: middle;
+}
+
+.headerTitle {
+  font-size: 1.5rem;
+  margin: 0;
+  color: var(--color-primary); /* */
+}
+
+/* 5. Contenido de la página (Bienvenida) */
+.pageContent {
+  padding: 2rem;
+  flex-grow: 1;
+}
+
+.pageContent h2 {
+  font-family: var(--font-heading); /* */
+  color: var(--color-primary); /* */
+}
+
+.pageContent p {
+  font-family: var(--font-body); /* */
+  color: var(--color-text); /* */
+  font-size: 1.1rem;
+}
+
+/* 6. ESTILOS PARA EL BOTÓN DE LOGOUT (Añadir al final) */
+.logoutSection {
+  margin-top: auto; /* ¡Esta es la magia! Empuja el botón al fondo */
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2); /* Un separador sutil */
+}
+
+.logoutButton {
+  /* Reutiliza estilos de navLink pero como botón */
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  
+  /* Estilos de texto (igual a navLink) */
+  color: rgba(255, 255, 255, 0.8);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1rem; /* Aseguramos tamaño de fuente */
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+/* Centra el ícono cuando está colapsado */
+.closed .logoutButton {
+  justify-content: center;
+  padding: 1rem;
+}
+
+/* Color de "peligro" al hacer hover */
+.logoutButton:hover {
+  background-color: #c9302c; /* Un rojo oscuro */
+  color: var(--color-white);
+}
+
+.logoutButton .material-symbols-outlined {
+  font-size: 1.8rem;
+  min-width: 24px;
+}

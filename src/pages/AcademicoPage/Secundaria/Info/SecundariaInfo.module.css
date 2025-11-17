@@ -1,0 +1,151 @@
+/* Animación */
+.infoPageContainer {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* --- 1. BARRA DE NAVEGACIÓN (Correcta) --- */
+.pageNavigation {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between; /* Pone un link a cada lado */
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+/* Estilo del enlace "Volver" (Izquierda) */
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--color-primary);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.backLink:hover {
+  text-decoration: underline;
+}
+
+/* Estilo del enlace "Contextual" (Derecha) */
+.contextLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--color-accent);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.contextLink:hover {
+  text-decoration: underline;
+}
+/* ------------------------------------- */
+
+/* 2. Estilo del Encabezado */
+.contentHeader {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid var(--color-accent);
+}
+.contentHeader h1 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: var(--color-primary);
+  font-size: 2.5rem;
+}
+.contentHeader p {
+  font-size: 1.15rem;
+  max-width: 700px;
+  margin: 0 auto;
+  color: var(--color-text);
+  line-height: 1.7;
+}
+
+/* 3. Estilos de Secciones */
+.scheduleSection,
+.propuestaSection {
+  margin-bottom: 2.5rem;
+}
+.scheduleSection h2,
+.propuestaSection h2 {
+  font-family: var(--font-heading);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+/* "Tarjetas" de Horario */
+.scheduleGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+.scheduleCard {
+  background: var(--color-white);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-top: 5px solid var(--color-primary);
+}
+.scheduleCard h3 {
+  margin: 0 0 0.5rem 0;
+  font-family: var(--font-heading);
+  color: var(--color-text);
+  font-size: 1.1rem;
+}
+.scheduleTime {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0;
+  font-family: var(--font-heading);
+}
+
+/* 4. Sección (Propuesta) */
+.propuestaSection {
+  background: var(--color-white);
+  padding: 2rem 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+.propuestaSection ul {
+  padding-left: 20px;
+  line-height: 1.8;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 600px) {
+  .contentHeader h1 {
+    font-size: 2rem;
+  }
+  .pageNavigation {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .backLink, .contextLink {
+    justify-content: center;
+    padding: 0.5rem;
+  }
+  .contextLink {
+    background: #fdfdfd;
+    border-radius: 8px;
+    border: 1px solid #eee;
+  }
+}
+
+/* Animación */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
