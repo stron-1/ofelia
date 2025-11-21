@@ -1,6 +1,4 @@
-# docker-compose.yml (CORREGIDO CON HEALTHCHECK Y SINTAXIS CORRECTA)
-
-services: # <-- Inicio de la sección de servicios
+services:
   frontend:
     build:
       context: .
@@ -10,49 +8,6 @@ services: # <-- Inicio de la sección de servicios
     volumes:
       - .:/app
       - /app/node_modules
-      - ./src:/app/src
-      - ./public:/app/public
+    environment:
+      - CHOKIDAR_USEPOLLING=true
     command: npm run dev -- --host
-    depends_on:
-      backend: # Frontend espera a que backend simplemente arranque
-        condition: service_started
-
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    ports:
-      - "5000:5000"
-    volumes:
-      - ./backend/index.js:/app/index.js
-      - ./backend/uploads:/app/uploads
-    depends_on:
-      db: # Backend SÍ espera a que la BD esté SALUDABLE
-        condition: service_healthy # <-- ¡LA CLAVE!
-    environment:
-      - NODE_ENV=development
-      - DATABASE_URL=postgresql://admin:supersecret@db:5432/ofelia_db
-      - JWT_SECRET=52af95a47bf6b6568769553e83f6eafd41238d04307b3496fbddd474ca22133d726dd06bce77a7a005776bf71a782a8ed3346337425e2023b3b9d7793befecd8
-
-  db:
-    image: postgres:14-alpine
-    # Quita los ports si no necesitas conectar desde fuera de Docker
-    # ports:
-    #   - "5432:5432"
-    volumes:
-      # Usa el volumen NOMBRADO para los datos
-      - postgres-data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=supersecret
-      - POSTGRES_DB=ofelia_db
-    healthcheck: # <-- Chequeo de salud para Postgres
-      test: ["CMD-SHELL", "pg_isready -U admin -d ofelia_db"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      start_period: 10s # Darle 10s para que arranque antes de chequear
-
-# --- DEFINICIÓN DE VOLÚMENES (AL FINAL DEL ARCHIVO) ---
-volumes: # <-- Fuera de 'services', al nivel raíz
-  postgres-data: # <-- Aquí se define el volumen nombrado
