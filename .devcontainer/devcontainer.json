@@ -1,0 +1,19 @@
+{
+  "name": "Ofelia Full Stack Dev",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "frontend",
+  "workspaceFolder": "/app",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "editor.formatOnSave": true
+      }
+    }
+  },
+  // Esto asegura que cuando se cierre el VS Code, no se apague todo el servicio bruscamente si quieres
+  "shutdownAction": "none"
+}

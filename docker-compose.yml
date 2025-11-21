@@ -8,6 +8,8 @@ services: # <-- Inicio de la sección de servicios
     ports:
       - "5173:5173"
     volumes:
+      - .:/app
+      - /app/node_modules
       - ./src:/app/src
       - ./public:/app/public
     command: npm run dev -- --host
