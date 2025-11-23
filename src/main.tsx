@@ -12,8 +12,7 @@ import { ContactoPage } from './pages/ContactoPage/ContactoPage';
 import { AcademicoPage } from './pages/AcademicoPage/AcademicoPage';
 import { AcademicoIndex } from './pages/AcademicoPage/AcademicoIndex';
 
-import { PrimariaInfo } from './pages/AcademicoPage/Primaria/Info/PrimariaInfo';
-import { GaleriaPrimaria } from './pages/AcademicoPage/Primaria/Galeria/GaleriaPrimaria';
+// Solo importamos Secundaria
 import { SecundariaInfo } from './pages/AcademicoPage/Secundaria/Info/SecundariaInfo';
 import { GaleriaSecundaria } from './pages/AcademicoPage/Secundaria/Galeria/GaleriaSecundaria';
 
@@ -23,7 +22,7 @@ import { PersonalAdministrativo } from './pages/AcademicoPage/Personal/Administr
 import { ProtectedRoute } from './components/common/ProtectedRoute/ProtectedRoute';
 import { DashboardPage } from './pages/DashboardPage/DashboardPage';
 import { DashboardIndex } from './pages/Admin/DashboardIndex';
-import { GestionPrimariaPage } from './pages/Admin/GestionPrimariaPage';
+// Solo importamos gestiones de Secundaria y Personal
 import { GestionSecundariaPage } from './pages/Admin/GestionSecundariaPage';
 import { GestionDirectivosPage } from './pages/Admin/GestionDirectivosPage';
 import { GestionAdministrativosPage } from './pages/Admin/GestionAdministrativosPage';
@@ -43,8 +42,7 @@ const router = createBrowserRouter([
         element: <AcademicoPage />,
         children: [
           { index: true, element: <AcademicoIndex /> },
-          { path: "primaria-info", element: <PrimariaInfo /> },
-          { path: "primaria-galeria", element: <GaleriaPrimaria /> },
+          // Eliminadas rutas de Primaria
           { path: "secundaria-info", element: <SecundariaInfo /> },
           { path: "secundaria-galeria", element: <GaleriaSecundaria /> },
           { path: "directivos", element: <PersonalDirectivo /> },
@@ -62,7 +60,7 @@ const router = createBrowserRouter([
     ),
     children: [
       { path: "dashboard", element: <DashboardIndex /> },
-      { path: "primaria", element: <GestionPrimariaPage /> },
+      // Eliminada ruta de gestión primaria
       { path: "secundaria", element: <GestionSecundariaPage /> },
       { path: "directivos", element: <GestionDirectivosPage /> },
       { path: "administrativos", element: <GestionAdministrativosPage /> },

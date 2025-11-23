@@ -23,25 +23,29 @@ export function DashboardPage() {
         </div>
         <nav className={styles.navMenu}>
           
-          {/* CAMBIO: Apuntar a /admin/dashboard */}
+          {/* Inicio */}
           <NavLink to="/admin/dashboard" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`} end>
             <span className="material-symbols-outlined">home</span>
             {isSidebarOpen && <span className={styles.linkText}>Inicio</span>}
           </NavLink>
           
-          {/* CAMBIO: Apuntar a /admin/primaria */}
-          <NavLink to="/admin/primaria" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>
-            <span className="material-symbols-outlined">school</span>
-            {isSidebarOpen && <span className={styles.linkText}>Primaria</span>}
-          </NavLink>
-          
-          {/* CAMBIO: Apuntar a /admin/secundaria */}
+          {/* Secundaria */}
           <NavLink to="/admin/secundaria" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>
             <span className="material-symbols-outlined">menu_book</span>
             {isSidebarOpen && <span className={styles.linkText}>Secundaria</span>}
           </NavLink>
 
-          {/* ... Repite el cambio /admin/... para los demás enlaces ... */}
+          {/* Directivos (NUEVO) */}
+          <NavLink to="/admin/directivos" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>
+            <span className="material-symbols-outlined">supervisor_account</span>
+            {isSidebarOpen && <span className={styles.linkText}>Directivos</span>}
+          </NavLink>
+
+          {/* Administrativos (NUEVO) */}
+          <NavLink to="/admin/administrativos" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>
+            <span className="material-symbols-outlined">support_agent</span>
+            {isSidebarOpen && <span className={styles.linkText}>Administrativos</span>}
+          </NavLink>
 
         </nav>
         <div className={styles.logoutSection}>
@@ -60,7 +64,6 @@ export function DashboardPage() {
           <h1 className={styles.headerTitle}>Panel de Administración</h1>
         </header>
         <main className={styles.pageContent}>
-          {/* AQUÍ SE CARGARÁN LAS PÁGINAS HIJAS (GestionPrimaria, etc.) */}
           <Outlet />
         </main>
       </div>

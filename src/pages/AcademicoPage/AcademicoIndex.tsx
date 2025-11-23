@@ -9,9 +9,10 @@ import {
 import Folder from '../../components/ui/Folder/Folder';
 import imgMetodologia from '../../assets/images/academico_metodologia.jpg';
 
-// --- HOJA: INFORMACIÓN DE SECUNDARIA (LINK CORREGIDO) ---
+// --- ENLACES CORREGIDOS SEGÚN MAIN.TSX ---
+
 const paperSecundariaInfo = (
-  <Link to="secundaria/info" className={styles.paperLink}>
+  <Link to="secundaria-info" className={styles.paperLink}>
     <div className={styles.paperIcon}>
       <BsInfoCircle />
     </div>
@@ -19,9 +20,8 @@ const paperSecundariaInfo = (
   </Link>
 );
 
-// --- HOJA: GALERÍA DE SECUNDARIA (LINK CORREGIDO) ---
 const paperSecundariaGaleria = (
-  <Link to="secundaria/galeria" className={styles.paperLink}>
+  <Link to="secundaria-galeria" className={styles.paperLink}>
     <div className={styles.paperIcon}>
       <BsImages />
     </div>
@@ -29,50 +29,35 @@ const paperSecundariaGaleria = (
   </Link>
 );
 
-// --- HOJA: PERSONAL DIRECTIVO (LINK CORREGIDO) ---
 const paperPersonalInfo = (
-  <Link to="personal/directores" className={styles.paperLink}>
+  <Link to="directivos" className={styles.paperLink}>
     <div className={styles.paperIcon}>
       <BsPersonBadge />
     </div>
-    <span className={styles.paperTitle}>Directorio</span>
+    <span className={styles.paperTitle}>Directivos</span>
   </Link>
 );
 
-// --- HOJA: PERSONAL ADMINISTRATIVO (LINK CORREGIDO) ---
 const paperPersonalGaleria = (
-  <Link to="personal/administrativos" className={styles.paperLink}>
+  <Link to="administrativos" className={styles.paperLink}>
     <div className={styles.paperIcon}>
       <BsPeople />
     </div>
-    <span className={styles.paperTitle}>Fotos</span>
+    <span className={styles.paperTitle}>Administrativos</span>
   </Link>
 );
 
-/**
- * Esta ES la página que muestra las carpetas.
- * Se renderizará "dentro" del Outlet de AcademicoPage.tsx
- * cuando la ruta sea exactamente "/academico"
- */
 export function AcademicoIndex() {
   return (
-    // Usamos un Fragment (<>) porque el div "page-container" ya está en el padre
     <>
-      <h1>Excelencia Educativa</h1>
-      <p className={styles.introParagraph}>
-        Nuestro compromiso es ofrecer una formación académica de primer nivel,
-        preparando a los estudiantes para los desafíos del futuro con un enfoque
-        integral y moderno.
-      </p>
-
-      {/* SECCIÓN DE CARPETAS */}
-      <section className={styles.folderSection}>
+      <section className={styles.nivelesSection}>
         <h2>Niveles y Personal</h2>
-        <p className={styles.folderIntro}>
+        <p className={styles.sectionIntro}>
           Haz clic en una carpeta para conocer nuestros niveles y personal.
         </p>
 
         <div className={styles.folderGrid}>
+          {/* CARPETA SECUNDARIA */}
           <div className={styles.folderWrapper}>
             <Folder
               color="var(--color-accent)"
@@ -82,6 +67,7 @@ export function AcademicoIndex() {
             <h3 className={styles.folderTitle}>Nivel Secundaria</h3>
           </div>
 
+          {/* CARPETA PERSONAL */}
           <div className={styles.folderWrapper}>
             <Folder
               color="#E74C3C"

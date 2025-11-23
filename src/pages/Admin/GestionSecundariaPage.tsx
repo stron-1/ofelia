@@ -1,10 +1,11 @@
 import { useState, useEffect, type FormEvent, type ChangeEvent } from 'react';
 import { BsPencil, BsTrash, BsPlusCircle } from 'react-icons/bs';
-import styles from './GestionPrimariaPage.module.css'; // Reutilizamos los mismos estilos
+// Reutilizamos estilos
+import styles from './GestionSecundariaPage.module.css'; 
 import { seccionService, type Seccion } from '../../api/services/seccionService';
+import { IMAGE_BASE_URL } from '../../api/apiClient';
 
-// --- IDs y Nombres para Secundaria ---
-// Asumimos 7-11 para Secundaria (Primaria fue 1-6)
+// IDs para Secundaria
 const mockGrados = [
   { id: 7, nombre: 'Primer Grado - Secundaria' },
   { id: 8, nombre: 'Segundo Grado - Secundaria' },
@@ -20,7 +21,6 @@ const initialState = {
 };
 
 export function GestionSecundariaPage() {
-  // Estado inicial apunta al primer ID de secundaria (7)
   const [gradoSeleccionado, setGradoSeleccionado] = useState<number>(7);
   const [secciones, setSecciones] = useState<Seccion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -32,10 +32,26 @@ export function GestionSecundariaPage() {
   
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  
+
   useEffect(() => {
     cargarSecciones(gradoSeleccionado);
   }, [gradoSeleccionado]);
+
+  // --- HELPER: Limpiar y Construir URL de imagen ---
+  const getImageUrl = (path: string | null) => {
+    // Si no hay ruta válida, devolvemos null
+    if (!path || path === 'null' || path === '') return null;
+    
+    // Si ya es web completa, la usamos
+    if (path.startsWith('http')) return path;
+
+    // Limpiamos 'backend/' y barras invertidas de Windows
+    let cleanPath = path.replace(/^backend[/\\]/, ''); 
+    cleanPath = cleanPath.replace(/\\/g, '/');
+
+    // Concatenamos con la URL base (http://localhost/ofelia-api/)
+    return `${IMAGE_BASE_URL}${cleanPath}`;
+  };
 
   const cargarSecciones = async (gradoId: number) => {
     setIsLoading(true);
@@ -59,10 +75,16 @@ export function GestionSecundariaPage() {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setSelectedFile(file);
+      // Creamos una URL temporal local para previsualizar lo que acabamos de subir
       setPreviewImage(URL.createObjectURL(file));
     } else {
       setSelectedFile(null);
-      setPreviewImage(null);
+      // Si cancela la selección, restauramos la imagen de la BD si estamos editando
+      if (editingSeccion) {
+        setPreviewImage(getImageUrl(editingSeccion.imagen_url));
+      } else {
+        setPreviewImage(null);
+      }
     }
   };
 
@@ -76,7 +98,8 @@ export function GestionSecundariaPage() {
         docente_nombre: seccion.docente_nombre,
         turno: seccion.turno as 'Mañana' | 'Tarde',
       });
-      setPreviewImage(seccion.imagen_url ? `/${seccion.imagen_url}` : null);
+      // Cargamos la imagen existente
+      setPreviewImage(getImageUrl(seccion.imagen_url));
     } else {
       setEditingSeccion(null);
       setFormData(initialState);
@@ -112,27 +135,26 @@ export function GestionSecundariaPage() {
     } catch (err) {
       console.error(err);
       if (err instanceof Error) setError(err.message);
-      else setError('Ocurrió un error desconocido');
+      else setError('Error al guardar la sección');
     }
   };
 
   const handleDelete = async (seccionId: number) => {
-    if (window.confirm('¿Estás seguro?')) {
+    if (window.confirm('¿Eliminar esta sección permanentemente?')) {
       try {
         setError(null);
         await seccionService.remove(seccionId);
         cargarSecciones(gradoSeleccionado);
       } catch (err) {
         console.error(err);
-        if (err instanceof Error) setError(err.message);
-        else setError('Ocurrió un error desconocido');
+        setError('No se pudo eliminar la sección');
       }
     }
   };
 
   return (
     <div className={styles.adminPageContainer}>
-      <h2>Gestión de Secciones de Secundaria</h2>
+      <h2>Gestión de Secundaria</h2>
 
       <div className={styles.filterSection}>
         <label htmlFor="gradeSelect">Seleccionar Grado:</label>
@@ -150,7 +172,7 @@ export function GestionSecundariaPage() {
       </div>
 
       <button className={styles.addButton} onClick={() => handleOpenForm()}>
-        <BsPlusCircle /> Nueva Sección para {mockGrados.find(g => g.id === gradoSeleccionado)?.nombre}
+        <BsPlusCircle /> Nueva Sección
       </button>
 
       {error && <p className={styles.errorMessage}>{error}</p>}
@@ -160,12 +182,22 @@ export function GestionSecundariaPage() {
           <h4>{editingSeccion ? 'Editar' : 'Nueva'} Sección</h4>
           
           <div className={styles.formGroup}>
-            <label>Sección (A, B, C...)</label>
-            <input name="nombre_seccion" value={formData.nombre_seccion} onChange={handleTextChange} required />
+            <label>Sección</label>
+            <input 
+              name="nombre_seccion" 
+              value={formData.nombre_seccion} 
+              onChange={handleTextChange} 
+              required 
+            />
           </div>
           <div className={styles.formGroup}>
-            <label>Docente (Nombre y Apellido)</label>
-            <input name="docente_nombre" value={formData.docente_nombre} onChange={handleTextChange} required />
+            <label>Docente Tutor</label>
+            <input 
+              name="docente_nombre" 
+              value={formData.docente_nombre} 
+              onChange={handleTextChange} 
+              required 
+            />
           </div>
           <div className={styles.formGroup}>
             <label>Turno</label>
@@ -180,12 +212,25 @@ export function GestionSecundariaPage() {
             <input type="file" name="imagen" accept="image/*" onChange={handleFileChange} />
           </div>
 
-          {previewImage && (
-            <div className={styles.imagePreview}>
-              <p>Previsualización:</p>
-              <img src={previewImage} alt="Previsualización" />
-            </div>
-          )}
+          <div className={styles.imagePreview}>
+            <p>Vista previa:</p>
+            {previewImage ? (
+              <img 
+                src={previewImage} 
+                alt="Preview" 
+                style={{ maxWidth: '150px', borderRadius: '8px', border: '1px solid #ddd' }}
+                onError={(e) => e.currentTarget.style.display = 'none'}
+              />
+            ) : (
+              <div style={{
+                width: '120px', height: '120px', background: '#f0f0f0', 
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#888', border: '1px dashed #ccc', borderRadius: '8px'
+              }}>
+                Sin imagen
+              </div>
+            )}
+          </div>
 
           <div className={styles.formActions}>
             <button type="submit" className={styles.saveBtn}>Guardar</button>
@@ -194,38 +239,64 @@ export function GestionSecundariaPage() {
         </form>
       )}
 
-      {isLoading && <p>Cargando...</p>}
+      {isLoading && <p>Cargando datos...</p>}
       
       {!isLoading && !error && (
         <table className={styles.adminTable}>
           <thead>
             <tr>
-              <th>Imagen</th> 
+              <th>Foto</th> 
+              <th>Grado</th> {/* <--- NUEVA COLUMNA */}
               <th>Sección</th>
-              <th>Docente</th>
+              <th>Tutor</th>
               <th>Turno</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {secciones.map((seccion) => (
-              <tr key={seccion.id}>
-                <td>
-                  <img 
-                    src={seccion.imagen_url ? `/${seccion.imagen_url}` : '/placeholder-docente.png'} 
-                    alt={seccion.docente_nombre}
-                    className={styles.tableImage}
-                  />
-                </td>
-                <td>{seccion.nombre_seccion}</td>
-                <td>{seccion.docente_nombre}</td>
-                <td>{seccion.turno}</td>
-                <td className={styles.actionsCell}>
-                  <button onClick={() => handleOpenForm(seccion)} className={styles.editBtn}><BsPencil /></button>
-                  <button onClick={() => handleDelete(seccion.id)} className={styles.deleteBtn}><BsTrash /></button>
+            {secciones.map((seccion) => {
+              const imgUrl = getImageUrl(seccion.imagen_url);
+              
+              // TRUCO: Buscamos el nombre del grado basándonos en el ID guardado
+              const nombreGrado = mockGrados.find(g => g.id === seccion.grado_id)?.nombre || 'Grado Desconocido';
+
+              return (
+                <tr key={seccion.id}>
+                  <td>
+                    {imgUrl ? (
+                      <img 
+                        src={imgUrl} 
+                        alt={seccion.docente_nombre}
+                        className={styles.tableImage}
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                    ) : (
+                      <div className={styles.tableImage} style={{background: '#eee', display:'flex', alignItems:'center', justifyContent:'center'}}>
+                        <span style={{fontSize:'10px', color: '#666'}}>Sin foto</span>
+                      </div>
+                    )}
+                  </td>
+                  
+                  {/* AQUI SE MUESTRA EL TEXTO EN VEZ DEL NUMERO */}
+                  <td style={{fontWeight: 'bold', color: '#555'}}>{nombreGrado}</td>
+                  
+                  <td>{seccion.nombre_seccion}</td>
+                  <td>{seccion.docente_nombre}</td>
+                  <td>{seccion.turno}</td>
+                  <td className={styles.actionsCell}>
+                    <button onClick={() => handleOpenForm(seccion)} className={styles.editBtn}><BsPencil /></button>
+                    <button onClick={() => handleDelete(seccion.id)} className={styles.deleteBtn}><BsTrash /></button>
+                  </td>
+                </tr>
+              );
+            })}
+            {secciones.length === 0 && (
+              <tr>
+                <td colSpan={6} style={{textAlign: 'center', padding: '1rem'}}>
+                  No hay registros en este grado.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       )}

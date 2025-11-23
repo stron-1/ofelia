@@ -1,3 +1,5 @@
+import { apiClient } from '../apiClient';
+
 export interface Administrativo {
   id: number;
   nombre: string;
@@ -6,47 +8,24 @@ export interface Administrativo {
   imagen_url: string | null;
 }
 
-/** [R]EAD: Get all administrative staff */
+/** [R]EAD */
 const getTodos = async (): Promise<Administrativo[]> => {
-  const res = await fetch('/api/administrativos');
-  if (!res.ok) throw new Error('Error loading administrative staff');
-  return res.json();
+  return apiClient.get<Administrativo[]>('administrativos');
 };
 
-/** [C]REATE: Create a new administrative member */
+/** [C]REATE */
 const create = async (formData: FormData): Promise<Administrativo> => {
-  const res = await fetch('/api/administrativos', {
-    method: 'POST',
-    body: formData,
-  });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error || 'Error creating');
-  }
-  return res.json();
+  return apiClient.post<Administrativo>('administrativos', formData);
 };
 
-/** [U]PDATE: Update an administrative member */
+/** [U]PDATE */
 const update = async (id: number, formData: FormData): Promise<Administrativo> => {
-  const res = await fetch(`/api/administrativos/${id}`, {
-    method: 'PUT',
-    body: formData,
-  });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error || 'Error updating');
-  }
-  return res.json();
+  return apiClient.put<Administrativo>('administrativos', id, formData);
 };
 
-/** [D]ELETE: Delete an administrative member */
+/** [D]ELETE */
 const remove = async (id: number): Promise<{ message: string }> => {
-  const res = await fetch(`/api/administrativos/${id}`, { method: 'DELETE' });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error || 'Error deleting');
-  }
-  return res.json();
+  return apiClient.delete<{ message: string }>('administrativos', id);
 };
 
 export const administrativoService = {

@@ -1,11 +1,12 @@
 import { useState, useEffect, type FormEvent, type ChangeEvent } from 'react';
 import { BsPencil, BsTrash, BsPlusCircle } from 'react-icons/bs';
-import styles from './GestionPrimariaPage.module.css'; // Reutilizamos estilos
-import { administrativoService, type Administrativo } from '../../api/services/administrativoService'; // <-- Servicio correcto
+import styles from './GestionSecundariaPage.module.css'; 
+import { administrativoService, type Administrativo } from '../../api/services/administrativoService';
+import { IMAGE_BASE_URL } from '../../api/apiClient';
 
 const initialState = {
   nombre: '',
-  cargo: '', // El admin debe escribir el cargo
+  cargo: '',
   turno: 'Mañana',
 };
 
@@ -25,11 +26,19 @@ export function GestionAdministrativosPage() {
     cargarAdministrativos();
   }, []);
 
+  const getImageUrl = (path: string | null) => {
+    if (!path || path === 'null' || path === '') return null;
+    if (path.startsWith('http')) return path;
+    let cleanPath = path.replace(/^backend[/\\]/, '');
+    cleanPath = cleanPath.replace(/\\/g, '/');
+    return `${IMAGE_BASE_URL}${cleanPath}`;
+  };
+
   const cargarAdministrativos = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await administrativoService.getTodos(); // <-- Usar servicio correcto
+      const data = await administrativoService.getTodos();
       setAdministrativos(data);
     } catch (err) {
       console.error(err);
@@ -50,7 +59,11 @@ export function GestionAdministrativosPage() {
       setPreviewImage(URL.createObjectURL(file));
     } else {
       setSelectedFile(null);
-      setPreviewImage(null);
+      if (editingAdmin) {
+        setPreviewImage(getImageUrl(editingAdmin.imagen_url));
+      } else {
+        setPreviewImage(null);
+      }
     }
   };
 
@@ -62,9 +75,9 @@ export function GestionAdministrativosPage() {
       setFormData({
         nombre: admin.nombre,
         cargo: admin.cargo,
-        turno: admin.turno as 'Mañana' | 'Tarde' | 'Completo',
+        turno: admin.turno,
       });
-      setPreviewImage(admin.imagen_url ? `/${admin.imagen_url}` : null);
+      setPreviewImage(getImageUrl(admin.imagen_url));
     } else {
       setEditingAdmin(null);
       setFormData(initialState);
@@ -84,121 +97,119 @@ export function GestionAdministrativosPage() {
 
     try {
       if (editingAdmin) {
-        if (selectedFile) {
-          data.append('imagen', selectedFile);
-        }
-        await administrativoService.update(editingAdmin.id, data); // <-- Usar servicio correcto
+        if (selectedFile) data.append('imagen', selectedFile);
+        await administrativoService.update(editingAdmin.id, data);
       } else {
-        if (selectedFile) {
-          data.append('imagen', selectedFile);
-        }
-        await administrativoService.create(data); // <-- Usar servicio correcto
+        if (selectedFile) data.append('imagen', selectedFile);
+        await administrativoService.create(data);
       }
       setIsFormOpen(false);
       cargarAdministrativos();
     } catch (err) {
       console.error(err);
       if (err instanceof Error) setError(err.message);
-      else setError('Ocurrió un error desconocido');
+      else setError('Error al guardar administrativo');
     }
   };
 
-  const handleDelete = async (adminId: number) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar a este miembro?')) {
+  const handleDelete = async (id: number) => {
+    if (window.confirm('¿Eliminar este administrativo?')) {
       try {
         setError(null);
-        await administrativoService.remove(adminId); // <-- Usar servicio correcto
+        await administrativoService.remove(id);
         cargarAdministrativos();
       } catch (err) {
         console.error(err);
-        if (err instanceof Error) setError(err.message);
-        else setError('Ocurrió un error desconocido');
+        setError('No se pudo eliminar');
       }
     }
   };
 
   return (
     <div className={styles.adminPageContainer}>
-      <h2>Gestión de Personal Administrativo</h2> {/* <-- Texto en Español */}
+      <h2>Gestión de Personal Administrativo</h2>
 
       <button className={styles.addButton} onClick={() => handleOpenForm()}>
-        <BsPlusCircle /> Añadir Nuevo Miembro {/* <-- Texto en Español */}
+        <BsPlusCircle /> Nuevo Administrativo
       </button>
 
       {error && <p className={styles.errorMessage}>{error}</p>}
 
       {isFormOpen && (
         <form onSubmit={handleSubmit} className={styles.crudForm}>
-          <h4>{editingAdmin ? 'Editar' : 'Nuevo'} Miembro Administrativo</h4> {/* <-- Texto en Español */}
-
+          <h4>{editingAdmin ? 'Editar' : 'Nuevo'} Administrativo</h4>
+          
           <div className={styles.formGroup}>
-            <label>Nombre y Apellido</label> {/* <-- Texto en Español */}
+            <label>Nombre y Apellidos</label>
             <input name="nombre" value={formData.nombre} onChange={handleTextChange} required />
           </div>
           <div className={styles.formGroup}>
-            <label>Cargo / Puesto</label> {/* <-- Texto en Español */}
-            <input name="cargo" value={formData.cargo} onChange={handleTextChange} placeholder="Ej: Secretaria, Contador(a)" required />
+            <label>Cargo</label>
+            <input name="cargo" value={formData.cargo} onChange={handleTextChange} required />
           </div>
           <div className={styles.formGroup}>
-            <label>Turno</label> {/* <-- Texto en Español */}
+            <label>Turno</label>
             <select name="turno" value={formData.turno} onChange={handleTextChange}>
               <option value="Mañana">Mañana</option>
               <option value="Tarde">Tarde</option>
-              <option value="Completo">Completo</option>
             </select>
           </div>
-
           <div className={styles.formGroup}>
-            <label>Foto (Opcional)</label> {/* <-- Texto en Español */}
+            <label>Foto (Opcional)</label>
             <input type="file" name="imagen" accept="image/*" onChange={handleFileChange} />
           </div>
 
-          {previewImage && (
-            <div className={styles.imagePreview}>
-              <p>Previsualización:</p> {/* <-- Texto en Español */}
-              <img src={previewImage} alt="Previsualización" />
-            </div>
-          )}
+          <div className={styles.imagePreview}>
+            <p>Vista previa:</p>
+            {previewImage ? (
+              <img src={previewImage} alt="Preview" onError={(e) => e.currentTarget.style.display = 'none'} />
+            ) : (
+              <div style={{width: '100px', height: '100px', background: '#f0f0f0', display:'flex', alignItems:'center', justifyContent:'center', border:'1px dashed #ccc'}}>Sin imagen</div>
+            )}
+          </div>
 
           <div className={styles.formActions}>
-            <button type="submit" className={styles.saveBtn}>Guardar</button> {/* <-- Texto en Español */}
-            <button type="button" onClick={() => setIsFormOpen(false)} className={styles.cancelBtn}>Cancelar</button> {/* <-- Texto en Español */}
+            <button type="submit" className={styles.saveBtn}>Guardar</button>
+            <button type="button" onClick={() => setIsFormOpen(false)} className={styles.cancelBtn}>Cancelar</button>
           </div>
         </form>
       )}
 
-      {isLoading && <p>Cargando...</p>} {/* <-- Texto en Español */}
-
+      {isLoading && <p>Cargando datos...</p>}
+      
       {!isLoading && !error && (
         <table className={styles.adminTable}>
           <thead>
             <tr>
-              <th>Imagen</th> {/* <-- Texto en Español */}
-              <th>Nombre</th> {/* <-- Texto en Español */}
-              <th>Cargo</th> {/* <-- Texto en Español */}
-              <th>Turno</th> {/* <-- Texto en Español */}
-              <th>Acciones</th> {/* <-- Texto en Español */}
+              <th>Imagen</th> 
+              <th>Nombre</th>
+              <th>Cargo</th>
+              <th>Turno</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {administrativos.map((admin) => (
-              <tr key={admin.id}>
-                <td>
-                  <img
-                    src={admin.imagen_url ? `/${admin.imagen_url}` : '/placeholder-docente.png'}
-                    alt={admin.nombre}
-                    className={styles.tableImage}
-                  />
-                </td>
-                <td>{admin.nombre}</td>
-                <td>{admin.cargo}</td>
-                <td>{admin.turno}</td>
-                <td className={styles.actionsCell}>
-                  <button onClick={() => handleOpenForm(admin)} className={styles.editBtn}><BsPencil /></button>
-                  <button onClick={() => handleDelete(admin.id)} className={styles.deleteBtn}><BsTrash /></button>
-                </td>
-              </tr>
-            ))}
+            {administrativos.map((admin) => {
+              const imgUrl = getImageUrl(admin.imagen_url);
+              return (
+                <tr key={admin.id}>
+                  <td>
+                    {imgUrl ? (
+                      <img src={imgUrl} alt={admin.nombre} className={styles.tableImage} onError={(e) => e.currentTarget.style.display='none'} />
+                    ) : (
+                      <div className={styles.tableImage} style={{background: '#eee', display:'flex', alignItems:'center', justifyContent:'center'}}><span style={{fontSize:'10px'}}>Sin foto</span></div>
+                    )}
+                  </td>
+                  <td>{admin.nombre}</td>
+                  <td>{admin.cargo}</td>
+                  <td>{admin.turno}</td>
+                  <td className={styles.actionsCell}>
+                    <button onClick={() => handleOpenForm(admin)} className={styles.editBtn}><BsPencil /></button>
+                    <button onClick={() => handleDelete(admin.id)} className={styles.deleteBtn}><BsTrash /></button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}
