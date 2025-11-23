@@ -9,26 +9,6 @@ import {
 import Folder from '../../components/ui/Folder/Folder';
 import imgMetodologia from '../../assets/images/academico_metodologia.jpg';
 
-// --- HOJA: INFORMACIÓN DE PRIMARIA (LINK CORREGIDO) ---
-const paperPrimariaInfo = (
-  <Link to="primaria/info" className={styles.paperLink}>
-    <div className={styles.paperIcon}>
-      <BsInfoCircle />
-    </div>
-    <span className={styles.paperTitle}>Información</span>
-  </Link>
-);
-
-// --- HOJA: GALERÍA DE PRIMARIA (LINK CORREGIDO) ---
-const paperPrimariaGaleria = (
-  <Link to="primaria/galeria" className={styles.paperLink}>
-    <div className={styles.paperIcon}>
-      <BsImages />
-    </div>
-    <span className={styles.paperTitle}>Galería</span>
-  </Link>
-);
-
 // --- HOJA: INFORMACIÓN DE SECUNDARIA (LINK CORREGIDO) ---
 const paperSecundariaInfo = (
   <Link to="secundaria/info" className={styles.paperLink}>
@@ -93,15 +73,6 @@ export function AcademicoIndex() {
         </p>
 
         <div className={styles.folderGrid}>
-          <div className={styles.folderWrapper}>
-            <Folder
-              color="var(--color-primary)"
-              size={1.5}
-              items={[paperPrimariaInfo, paperPrimariaGaleria]}
-            />
-            <h3 className={styles.folderTitle}>Nivel Primaria</h3>
-          </div>
-
           <div className={styles.folderWrapper}>
             <Folder
               color="var(--color-accent)"

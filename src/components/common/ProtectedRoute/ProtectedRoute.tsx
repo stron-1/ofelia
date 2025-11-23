@@ -1,16 +1,21 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
+import { ReactNode } from 'react';
 
-export function ProtectedRoute() {
-  // Comprueba si el token existe en localStorage
+// 1. Definimos que este componente acepta "children" (otros componentes dentro)
+interface ProtectedRouteProps {
+  children: ReactNode;
+}
+
+export function ProtectedRoute({ children }: ProtectedRouteProps) {
+  // 2. Buscamos el token en el almacenamiento
   const token = localStorage.getItem('authToken');
 
-  if (token) {
-    // Si hay token, renderiza la página que está dentro (el Outlet)
-    // En este caso, será <DashboardPage />
-    return <Outlet />;
+  // 3. Si NO hay token, lo mandamos a la página de inicio (o login)
+  if (!token) {
+    // replace: true evita que pueda volver atrás con el navegador
+    return <Navigate to="/" replace />;
   }
 
-  // Si no hay token, redirige a la página de inicio
-  // (Puedes cambiarlo a '/contacto' si prefieres)
-  return <Navigate to="/" replace />;
+  // 4. Si SÍ hay token, mostramos el contenido protegido (DashboardPage)
+  return <>{children}</>;
 }

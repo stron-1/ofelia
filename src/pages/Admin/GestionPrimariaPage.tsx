@@ -2,6 +2,8 @@ import { useState, useEffect, type FormEvent, type ChangeEvent } from 'react';
 import { BsPencil, BsTrash, BsPlusCircle } from 'react-icons/bs';
 import styles from './GestionPrimariaPage.module.css';
 import { seccionService, type Seccion } from '../../api/services/seccionService';
+// Importamos la URL base de las imágenes desde tu configuración
+import { IMAGE_BASE_URL } from '../../api/apiClient';
 
 const mockGrados = [
   { id: 1, nombre: 'Primer Grado' },
@@ -34,6 +36,15 @@ export function GestionPrimariaPage() {
   useEffect(() => {
     cargarSecciones(gradoSeleccionado);
   }, [gradoSeleccionado]);
+
+  // Helper para construir la URL correcta de la imagen
+  const getImageUrl = (path: string | null) => {
+    if (!path) return '/placeholder-docente.png';
+    // Corrección de ruta: si la BD guardó "backend/uploads/...", lo limpiamos
+    const cleanPath = path.replace(/^backend\//, ''); 
+    // Retorna ej: http://localhost/ofelia-api/uploads/foto.jpg
+    return `${IMAGE_BASE_URL}${cleanPath}`;
+  };
 
   const cargarSecciones = async (gradoId: number) => {
     setIsLoading(true);
@@ -74,7 +85,8 @@ export function GestionPrimariaPage() {
         docente_nombre: seccion.docente_nombre,
         turno: seccion.turno as 'Mañana' | 'Tarde',
       });
-      setPreviewImage(seccion.imagen_url ? `/${seccion.imagen_url}` : null);
+      // Usamos el helper para mostrar la imagen existente
+      setPreviewImage(getImageUrl(seccion.imagen_url));
     } else {
       setEditingSeccion(null);
       setFormData(initialState);
@@ -97,6 +109,7 @@ export function GestionPrimariaPage() {
         if (selectedFile) {
           data.append('imagen', selectedFile);
         }
+        // El ID ahora se pasa como primer argumento
         await seccionService.update(editingSeccion.id, data);
       } else {
         data.append('grado_id', String(gradoSeleccionado));
@@ -115,7 +128,7 @@ export function GestionPrimariaPage() {
   };
 
   const handleDelete = async (seccionId: number) => {
-    if (window.confirm('¿Estás seguro?')) {
+    if (window.confirm('¿Estás seguro de eliminar esta sección?')) {
       try {
         setError(null);
         await seccionService.remove(seccionId);
@@ -123,7 +136,7 @@ export function GestionPrimariaPage() {
       } catch (err) {
         console.error(err);
         if (err instanceof Error) setError(err.message);
-        else setError('Ocurrió un error desconocido');
+        else setError('No se pudo eliminar la sección');
       }
     }
   };
@@ -181,6 +194,7 @@ export function GestionPrimariaPage() {
           {previewImage && (
             <div className={styles.imagePreview}>
               <p>Previsualización:</p>
+              {/* Nota: La previsualización local usa blob:, la remota usa getImageUrl */}
               <img src={previewImage} alt="Previsualización" />
             </div>
           )}
@@ -210,7 +224,7 @@ export function GestionPrimariaPage() {
               <tr key={seccion.id}>
                 <td>
                   <img 
-                    src={seccion.imagen_url ? `/${seccion.imagen_url}` : '/placeholder-docente.png'} 
+                    src={getImageUrl(seccion.imagen_url)} 
                     alt={seccion.docente_nombre}
                     className={styles.tableImage}
                   />
@@ -219,7 +233,6 @@ export function GestionPrimariaPage() {
                 <td>{seccion.docente_nombre}</td>
                 <td>{seccion.turno}</td>
                 <td className={styles.actionsCell}>
-                  {/* 2. AQUÍ ESTÁ LA CORRECCIÓN */}
                   <button onClick={() => handleOpenForm(seccion)} className={styles.editBtn}><BsPencil /></button>
                   <button onClick={() => handleDelete(seccion.id)} className={styles.deleteBtn}><BsTrash /></button>
                 </td>

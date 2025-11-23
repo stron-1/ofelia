@@ -1,109 +1,75 @@
-// src/main.tsx
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-
-// Estilos globales
 import './assets/styles/global.css';
 
-// Layouts
 import { RootLayout } from './components/layout/RootLayout';
-
-// Páginas Públicas (Importaciones estándar)
-import { HomePage } from './pages/HomePage';
-import { HistoriaPage } from './pages/HistoriaPage';
-import { NosotrosPage } from './pages/NosotrosPage';
-import { ActividadesPage } from './pages/ActividadesPage';
-import { ContactoPage } from './pages/ContactoPage';
-import { AcademicoPage } from './pages/AcademicoPage';
+import { HomePage } from './pages/HomePage/HomePage';
+import { HistoriaPage } from './pages/HistoriaPage/HistoriaPage';
+import { NosotrosPage } from './pages/NosotrosPage/NosotrosPage';
+import { ActividadesPage } from './pages/ActividadesPage/ActividadesPage';
+import { ContactoPage } from './pages/ContactoPage/ContactoPage';
+import { AcademicoPage } from './pages/AcademicoPage/AcademicoPage';
 import { AcademicoIndex } from './pages/AcademicoPage/AcademicoIndex';
-import { PrimariaInfo } from './pages/AcademicoPage/Primaria/Info';
-import { GaleriaPrimaria } from './pages/AcademicoPage/Primaria/Galeria';
-import { SecundariaInfo } from './pages/AcademicoPage/Secundaria/Info';
-import { GaleriaSecundaria } from './pages/AcademicoPage/Secundaria/Galeria';
-import { PersonalDirectivo } from './pages/AcademicoPage/Personal/Directores';
-import { PersonalAdministrativo } from './pages/AcademicoPage/Personal/Administrativos';
 
-// Páginas de Administración (Dashboard)
-import { ProtectedRoute } from './components/common/ProtectedRoute'; // Guardián de ruta
-import { DashboardPage } from './pages/DashboardPage'; // Layout del Dashboard
-import {
-  DashboardIndex,
-  GestionPrimariaPage,
-  GestionSecundariaPage,
-  GestionDirectivosPage,
-  GestionAdministrativosPage // <-- Asegúrate de importar la nueva página
-} from './pages/Admin'; // Importa todas las páginas de gestión
+import { PrimariaInfo } from './pages/AcademicoPage/Primaria/Info/PrimariaInfo';
+import { GaleriaPrimaria } from './pages/AcademicoPage/Primaria/Galeria/GaleriaPrimaria';
+import { SecundariaInfo } from './pages/AcademicoPage/Secundaria/Info/SecundariaInfo';
+import { GaleriaSecundaria } from './pages/AcademicoPage/Secundaria/Galeria/GaleriaSecundaria';
 
-// Configuración del Router
+import { PersonalDirectivo } from './pages/AcademicoPage/Personal/Directores/PersonalDIrectivo';
+import { PersonalAdministrativo } from './pages/AcademicoPage/Personal/Administrativos/PersonalAdministrativo';
+
+import { ProtectedRoute } from './components/common/ProtectedRoute/ProtectedRoute';
+import { DashboardPage } from './pages/DashboardPage/DashboardPage';
+import { DashboardIndex } from './pages/Admin/DashboardIndex';
+import { GestionPrimariaPage } from './pages/Admin/GestionPrimariaPage';
+import { GestionSecundariaPage } from './pages/Admin/GestionSecundariaPage';
+import { GestionDirectivosPage } from './pages/Admin/GestionDirectivosPage';
+import { GestionAdministrativosPage } from './pages/Admin/GestionAdministrativosPage';
+
 const router = createBrowserRouter([
   {
-    // --- Rutas Públicas ---
-    path: '/',
-    element: <RootLayout />, // Layout principal con Navbar y Footer
+    path: "/",
+    element: <RootLayout />,
     children: [
       { index: true, element: <HomePage /> },
-      { path: 'historia', element: <HistoriaPage /> },
-      { path: 'nosotros', element: <NosotrosPage /> },
+      { path: "historia", element: <HistoriaPage /> },
+      { path: "nosotros", element: <NosotrosPage /> },
+      { path: "actividades", element: <ActividadesPage /> },
+      { path: "contacto", element: <ContactoPage /> },
       {
-        path: 'academico',
-        element: <AcademicoPage />, // Layout específico para Académico
+        path: "academico",
+        element: <AcademicoPage />,
         children: [
-          { index: true, element: <AcademicoIndex /> }, // Índice de Académico
-          { path: 'primaria/info', element: <PrimariaInfo /> },
-          { path: 'primaria/galeria', element: <GaleriaPrimaria /> },
-          { path: 'secundaria/info', element: <SecundariaInfo /> },
-          { path: 'secundaria/galeria', element: <GaleriaSecundaria /> },
-          { path: 'personal/directores', element: <PersonalDirectivo /> },
-          { path: 'personal/administrativos', element: <PersonalAdministrativo /> },
-        ],
+          { index: true, element: <AcademicoIndex /> },
+          { path: "primaria-info", element: <PrimariaInfo /> },
+          { path: "primaria-galeria", element: <GaleriaPrimaria /> },
+          { path: "secundaria-info", element: <SecundariaInfo /> },
+          { path: "secundaria-galeria", element: <GaleriaSecundaria /> },
+          { path: "directivos", element: <PersonalDirectivo /> },
+          { path: "administrativos", element: <PersonalAdministrativo /> },
+        ]
       },
-      { path: 'actividades', element: <ActividadesPage /> },
-      { path: 'contacto', element: <ContactoPage /> },
-    ],
+    ]
   },
   {
-    // --- Rutas Protegidas del Dashboard ---
-    path: '/dashboard',
-    element: <ProtectedRoute />, // Primero verifica si el usuario está logueado
+    path: "/admin",
+    element: (
+      <ProtectedRoute>
+        <DashboardPage />
+      </ProtectedRoute>
+    ),
     children: [
-      {
-        // Si está logueado, renderiza el Layout del Dashboard
-        element: <DashboardPage />,
-        children: [
-          // Rutas específicas DENTRO del Dashboard
-          {
-            index: true, // Ruta: /dashboard
-            element: <DashboardIndex />, // Página de bienvenida del Dashboard
-          },
-          {
-            path: 'primaria', // Ruta: /dashboard/primaria
-            element: <GestionPrimariaPage />, // Gestión de secciones de primaria
-          },
-          {
-            path: 'secundaria', // Ruta: /dashboard/secundaria
-            element: <GestionSecundariaPage />, // Gestión de secciones de secundaria
-          },
-          {
-            path: 'directivos', // Ruta: /dashboard/directivos
-            element: <GestionDirectivosPage />, // Gestión de personal directivo
-          },
-          {
-            path: 'administrativos', // <-- NUEVA RUTA
-            element: <GestionAdministrativosPage />, // Gestión de personal administrativo
-          },
-          {
-            path: 'usuarios', // Ruta: /dashboard/usuarios (Ejemplo)
-            element: <div>Página de Gestión de Usuarios (Próximamente)</div>,
-          },
-        ],
-      },
-    ],
-  },
+      { path: "dashboard", element: <DashboardIndex /> },
+      { path: "primaria", element: <GestionPrimariaPage /> },
+      { path: "secundaria", element: <GestionSecundariaPage /> },
+      { path: "directivos", element: <GestionDirectivosPage /> },
+      { path: "administrativos", element: <GestionAdministrativosPage /> },
+    ]
+  }
 ]);
 
-// Renderizar la aplicación
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <RouterProvider router={router} />

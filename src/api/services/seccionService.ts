@@ -1,3 +1,5 @@
+import { apiClient } from '../apiClient';
+
 export interface Seccion {
   id: number;
   grado_id: number;
@@ -7,43 +9,26 @@ export interface Seccion {
   imagen_url: string | null;
 }
 
+// [R]EAD: Obtener secciones por grado
 const getPorGrado = async (gradoId: number): Promise<Seccion[]> => {
-  const res = await fetch(`/api/secciones/${gradoId}`);
-  if (!res.ok) throw new Error('Error al cargar');
-  return res.json();
+  // Enviamos el grado como parámetro extra: ?route=secciones&grado_id=1
+  return apiClient.get<Seccion[]>('secciones', `&grado_id=${gradoId}`);
 };
 
+// [C]REATE: Crear nueva sección
 const create = async (formData: FormData): Promise<Seccion> => {
-  const res = await fetch('/api/secciones', {
-    method: 'POST',
-    body: formData, // fetch maneja FormData automáticamente
-  });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error || 'Error al crear');
-  }
-  return res.json();
+  return apiClient.post<Seccion>('secciones', formData);
 };
 
+// [U]PDATE: Actualizar sección
 const update = async (id: number, formData: FormData): Promise<Seccion> => {
-  const res = await fetch(`/api/secciones/${id}`, {
-    method: 'PUT',
-    body: formData,
-  });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error || 'Error al actualizar');
-  }
-  return res.json();
+  // IMPORTANTE: Pasamos el ID por separado para que apiClient forme ?route=secciones&id=X
+  return apiClient.put<Seccion>('secciones', id, formData);
 };
 
+// [D]ELETE: Eliminar sección
 const remove = async (id: number): Promise<{ message: string }> => {
-  const res = await fetch(`/api/secciones/${id}`, { method: 'DELETE' });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error || 'Error al borrar');
-  }
-  return res.json();
+  return apiClient.delete<{ message: string }>('secciones', id);
 };
 
 export const seccionService = {

@@ -8,8 +8,11 @@ export function DashboardPage() {
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    navigate('/');
+    if(confirm('¿Cerrar sesión?')) {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        navigate('/');
+    }
   };
 
   return (
@@ -19,38 +22,28 @@ export function DashboardPage() {
           {isSidebarOpen && <span className={styles.logoName}>ADMIN</span>}
         </div>
         <nav className={styles.navMenu}>
-          {/* Inicio */}
-          <NavLink to="/dashboard" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`} end>
+          
+          {/* CAMBIO: Apuntar a /admin/dashboard */}
+          <NavLink to="/admin/dashboard" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`} end>
             <span className="material-symbols-outlined">home</span>
             {isSidebarOpen && <span className={styles.linkText}>Inicio</span>}
           </NavLink>
-          {/* Primaria */}
-          <NavLink to="/dashboard/primaria" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>
+          
+          {/* CAMBIO: Apuntar a /admin/primaria */}
+          <NavLink to="/admin/primaria" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>
             <span className="material-symbols-outlined">school</span>
             {isSidebarOpen && <span className={styles.linkText}>Primaria</span>}
           </NavLink>
-          {/* Secundaria */}
-          <NavLink to="/dashboard/secundaria" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>
-            <span className="material-symbols-outlined">local_library</span>
+          
+          {/* CAMBIO: Apuntar a /admin/secundaria */}
+          <NavLink to="/admin/secundaria" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>
+            <span className="material-symbols-outlined">menu_book</span>
             {isSidebarOpen && <span className={styles.linkText}>Secundaria</span>}
           </NavLink>
-          {/* Directivos */}
-          <NavLink to="/dashboard/directivos" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>
-            <span className="material-symbols-outlined">corporate_fare</span>
-            {isSidebarOpen && <span className={styles.linkText}>Directivos</span>}
-          </NavLink>
-          {/* --- ADMINISTRATIVOS (EN ESPAÑOL) --- */}
-          <NavLink to="/dashboard/administrativos" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>
-            <span className="material-symbols-outlined">support_agent</span>
-            {isSidebarOpen && <span className={styles.linkText}>Administrativos</span>} {/* <-- Texto en Español */}
-          </NavLink>
-          {/* Usuarios */}
-          <NavLink to="/dashboard/usuarios" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>
-            <span className="material-symbols-outlined">group</span>
-            {isSidebarOpen && <span className={styles.linkText}>Usuarios</span>}
-          </NavLink>
+
+          {/* ... Repite el cambio /admin/... para los demás enlaces ... */}
+
         </nav>
-        {/* Cerrar Sesión */}
         <div className={styles.logoutSection}>
           <button onClick={handleLogout} className={styles.logoutButton}>
             <span className="material-symbols-outlined">logout</span>
@@ -58,7 +51,7 @@ export function DashboardPage() {
           </button>
         </div>
       </aside>
-      {/* Área Principal */}
+      
       <div className={styles.mainArea}>
         <header className={styles.header}>
           <button onClick={toggleSidebar} className={styles.toggleBtn}>
@@ -67,6 +60,7 @@ export function DashboardPage() {
           <h1 className={styles.headerTitle}>Panel de Administración</h1>
         </header>
         <main className={styles.pageContent}>
+          {/* AQUÍ SE CARGARÁN LAS PÁGINAS HIJAS (GestionPrimaria, etc.) */}
           <Outlet />
         </main>
       </div>

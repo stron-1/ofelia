@@ -15,9 +15,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  if (!isOpen) {
-    return null;
-  }
+  if (!isOpen) return null;
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -27,35 +25,41 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
     try {
       const data = await authService.login({ email, password });
       
+      // Guardamos el token que nos devuelve PHP
       localStorage.setItem('authToken', data.token);
-      setSuccess('¡Login exitoso! Redirigiendo...');
+      
+      // Guardamos datos del usuario por si los necesitamos
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      setSuccess('¡Login exitoso!');
 
       setTimeout(() => {
-        navigate('/dashboard');
         onClose();
+        navigate('/admin/dashboard'); // O la ruta que uses para el Dashboard
+        window.location.reload(); // Forzamos recarga para actualizar el Navbar
       }, 1000);
 
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError('Ocurrió un error inesperado.');
+        setError('Credenciales incorrectas o error de servidor.');
       }
     }
   };
   
   const handleClose = () => {
-    setEmail('');
-    setPassword('');
     setError('');
     setSuccess('');
+    setEmail('');
+    setPassword('');
     onClose();
   };
 
   return (
     <div className={styles.modalOverlay} onClick={handleClose}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-        <h2>Acceso Administrador</h2>
+        <h2>Acceso Administrativo</h2>
         <form onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
             <label htmlFor="email">Correo Electrónico</label>
@@ -77,15 +81,15 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
               required
             />
           </div>
+          
           {error && <p className={styles.errorMessage}>{error}</p>}
           {success && <p className={styles.successMessage}>{success}</p>}
+          
           <button type="submit" className={styles.submitBtn}>
             Ingresar
           </button>
         </form>
-        <button className={styles.closeBtn} onClick={handleClose}>
-          ×
-        </button>
+        <button className={styles.closeBtn} onClick={handleClose}>×</button>
       </div>
     </div>
   );
