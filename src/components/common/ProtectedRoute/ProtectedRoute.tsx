@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 // 1. Definimos que este componente acepta "children" (otros componentes dentro)
 interface ProtectedRouteProps {

@@ -1,4 +1,7 @@
+version: '3.8'
+
 services:
+  # 1. FRONTEND (Vite/React)
   frontend:
     build:
       context: .
@@ -9,5 +12,46 @@ services:
       - .:/app
       - /app/node_modules
     environment:
-      - CHOKIDAR_USEPOLLING=true
-    command: npm run dev -- --host
+      - CHOKIDAR_USEPOLLING=true # Necesario en Linux para hot-reload a veces
+    depends_on:
+      - backend
+
+  # 2. BACKEND (PHP Apache)
+  backend:
+    image: php:8.2-apache
+    ports:
+      - "8000:80" # Puedes acceder directo por localhost:8000 si quieres
+    volumes:
+      - ./backend:/var/www/html
+    working_dir: /var/www/html
+    # Instalamos driver MySQL y activamos Apache
+    command: >
+      bash -c "docker-php-ext-install pdo pdo_mysql && docker-php-ext-enable pdo_mysql && apache2-foreground"
+
+  # 3. BASE DE DATOS (MySQL)
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_DATABASE: ofelia_db
+      MYSQL_ROOT_PASSWORD: rootpassword
+    volumes:
+      - db_data:/var/lib/mysql
+      # Aquí cargamos tu archivo SQL automáticamente al iniciar por primera vez
+      - ./backend/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # 4. PHPMYADMIN (Interfaz Gráfica tipo XAMPP)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - "8080:80" # Entra a http://localhost:8080
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: rootpassword
+    depends_on:
+      - db
+
+volumes:
+  db_data:

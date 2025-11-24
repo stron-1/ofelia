@@ -1,5 +1,5 @@
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost/ofelia-api/index.php';
-export const IMAGE_BASE_URL = import.meta.env.VITE_IMG_URL || 'http://localhost/ofelia-api/';
+const BASE_URL = '/api/index.php'; 
+export const IMAGE_BASE_URL = '/'; // Las imágenes también pasarán por el proxy
 
 async function client<T>(
   endpoint: string, 
@@ -10,6 +10,7 @@ async function client<T>(
   
   const headers: HeadersInit = {};
   
+  // Si no es multipart (archivos), indicamos que es JSON
   if (!isMultipart) {
     headers['Content-Type'] = 'application/json';
   }
@@ -20,10 +21,11 @@ async function client<T>(
     config.body = isMultipart ? (body as FormData) : JSON.stringify(body);
   }
 
-  // El endpoint llega sin "?" ni "/", ej: "secciones"
+  // Construimos la URL. Ejemplo resultante: /api/index.php?route=login
   const response = await fetch(`${BASE_URL}?route=${endpoint}`, config);
   
   if (!response.ok) {
+      // Intentamos leer el error del backend, si falla devolvemos objeto vacío
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.error || 'Error en la petición');
   }
@@ -38,7 +40,7 @@ export const apiClient = {
   post: <T>(route: string, body: object | FormData) => 
     client<T>(route, 'POST', body, body instanceof FormData),
     
-  // PHP requiere ID en URL para updates simulados
+  // Simulamos PUT mediante POST + ID en la URL para PHP
   put: <T>(route: string, id: number | string, body: object | FormData) => 
     client<T>(`${route}&id=${id}`, 'POST', body, body instanceof FormData),
     

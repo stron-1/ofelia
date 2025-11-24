@@ -8,12 +8,15 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://backend:5000',
+        // 'backend' es el nombre del servicio, puerto 80 es el puerto INTERNO de apache
+        target: 'http://backend:80', 
         changeOrigin: true,
+        // Eliminamos /api de la ruta porque tu index.php espera ?route=...
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
+      // Para cargar las imágenes
       '/uploads': {
-        target: 'http://backend:5000',
+        target: 'http://backend:80',
         changeOrigin: true,
       }
     }

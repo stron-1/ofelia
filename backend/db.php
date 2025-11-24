@@ -1,8 +1,11 @@
 <?php
-$host = 'localhost';
+// backend/db.php
+
+// En Docker, el host es el nombre del servicio en docker-compose
+$host = 'db'; 
 $db   = 'ofelia_db';
 $user = 'root'; 
-$pass = '';     
+$pass = 'rootpassword'; // La misma que pusimos en docker-compose
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
@@ -15,6 +18,7 @@ $options = [
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (\PDOException $e) {
+    // Si falla la conexión, intentamos dar un mensaje JSON claro
     header("Content-Type: application/json");
     http_response_code(500);
     echo json_encode(["error" => "Error de conexión BD: " . $e->getMessage()]);
