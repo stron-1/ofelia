@@ -3,26 +3,30 @@ import SpotlightCard from '../../components/ui/SpotlightCard';
 import styles from './HomePage.module.css';
 import { NavLink } from 'react-router-dom';
 
-// Importamos los iconos que usaremos
+// 1. IMPORTAMOS TUS IMÁGENES DEL HOME AQUÍ
+import img1 from '../../assets/images/InicioFotos_1.jpg';
+import img2 from '../../assets/images/InicioFotos_2.jpg';
+import img3 from '../../assets/images/InicioFotos_3.jpg';
+import img4 from '../../assets/images/InicioFotos_4.jpg';
+import img5 from '../../assets/images/InicioFotos_5.jpg';
+
 import {
-  BsAward,
-  BsPersonCheck,
-  BsPeople,
-  BsBuilding,
   BsCpu,
   BsHeart,
 } from 'react-icons/bs';
 
 export function HomePage() {
+  // 2. Definimos el array de imágenes para el Home
+  const heroImages = [img1, img2, img3, img4, img5];
+
   return (
     <>
-      {/* Carrusel (Sin cambios) */}
-      <Carousel />
+      {/* 3. Pasamos las imágenes al Carrusel */}
+      {/* Usamos height "80vh" para que se vea grande e impactante como antes */}
+      <Carousel images={heroImages} height="80vh" />
 
-      {/* Contenedor principal */}
       <div className="page-container">
         
-        {/* Sección Bienvenida (Sin cambios) */}
         <section className={styles.welcomeSection}>
           <h2>Bienvenidos a la I.E. Ofelia Velásquez</h2>
           <div className={styles.directorMessage}>
@@ -35,56 +39,10 @@ export function HomePage() {
           </div>
         </section>
 
-        {/* 2. SECCIÓN "POR QUÉ ELEGIRNOS" (Actualizada con SpotlightCard) */}
         <section className={styles.whyUsSection}>
           <h2>¿Por Qué Elegir Ofelia Velásquez?</h2>
           <div className={styles.featuresGrid}>
             
-            {/* Usamos tu color azul (rgba(1, 75, 160, 0.15)) */}
-            <SpotlightCard 
-              className={styles.featureCard} 
-              spotlightColor="rgba(1, 75, 160, 0.15)"
-            >
-              <div className={styles.featureIcon}><BsAward /></div>
-              <h3 className={styles.featureTitle}>Excelencia Académica</h3>
-              <p className={styles.featureDescription}>
-                Programas de alto rendimiento y docentes de primer nivel.
-              </p>
-            </SpotlightCard>
-
-            <SpotlightCard 
-              className={styles.featureCard} 
-              spotlightColor="rgba(1, 75, 160, 0.15)"
-            >
-              <div className={styles.featureIcon}><BsPersonCheck /></div>
-              <h3 className={styles.featureTitle}>Formación Integral</h3>
-              <p className={styles.featureDescription}>
-                Desarrollo de habilidades artísticas, deportivas y sociales.
-              </p>
-            </SpotlightCard>
-
-            <SpotlightCard 
-              className={styles.featureCard} 
-              spotlightColor="rgba(1, 75, 160, 0.15)"
-            >
-              <div className={styles.featureIcon}><BsPeople /></div>
-              <h3 className={styles.featureTitle}>Plana Docente</h3>
-              <p className={styles.featureDescription}>
-                Profesionales calificados y en constante capacitación.
-              </p>
-            </SpotlightCard>
-
-            <SpotlightCard 
-              className={styles.featureCard} 
-              spotlightColor="rgba(1, 75, 160, 0.15)"
-            >
-              <div className={styles.featureIcon}><BsBuilding /></div>
-              <h3 className={styles.featureTitle}>Infraestructura</h3>
-              <p className={styles.featureDescription}>
-                Aulas equipadas, laboratorios y espacios deportivos.
-              </p>
-            </SpotlightCard>
-
             <SpotlightCard 
               className={styles.featureCard} 
               spotlightColor="rgba(1, 75, 160, 0.15)"
@@ -105,11 +63,10 @@ export function HomePage() {
               <p className={styles.featureDescription}>
                 Fomentamos el respeto, la responsabilidad y la integridad.
               </p>
-            </SpotlightCard> {/* <-- ¡AQUÍ ESTÁ LA CORRECCIÓN! */}
+            </SpotlightCard>
           </div>
         </section>
 
-        {/* 3. SECCIÓN "HERO" (Sin cambios) */}
         <section className={styles.heroSection}>
           <div className={styles.heroContent}>
             <h1>Forjando Líderes para el Futuro</h1>

@@ -157,4 +157,161 @@ if ($tabla) {
         echo json_encode(["error" => "Error en servidor: " . $e->getMessage()]);
     }
 }
+
+// --- RUTA: ACTIVIDADES ---
+if ($route === 'actividades') {
+    // 1. LISTAR (GET) - Con JOIN para traer la galería
+    if ($method === 'GET') {
+        $categoria = $_GET['categoria'] ?? null;
+        
+        // Hacemos LEFT JOIN para traer las fotos de la galería concatenadas
+        $sql = "SELECT a.*, GROUP_CONCAT(g.imagen_url) as galeria_urls 
+                FROM actividades a 
+                LEFT JOIN actividades_galeria g ON a.id = g.actividad_id ";
+        
+        if ($categoria) {
+            $sql .= " WHERE a.categoria = ? ";
+        }
+        
+        $sql .= " GROUP BY a.id ORDER BY a.id DESC";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($categoria ? [$categoria] : []);
+        $resultados = $stmt->fetchAll();
+
+        // Procesamos los resultados para convertir el string "foto1.jpg,foto2.jpg" en un Array real
+        foreach ($resultados as &$fila) {
+            if (!empty($fila['galeria_urls'])) {
+                $fila['galeria'] = explode(',', $fila['galeria_urls']);
+            } else {
+                $fila['galeria'] = [];
+            }
+            
+            // Truco: Agregamos la portada a la galería si no está repetida, para que el carrusel tenga al menos 1 foto
+            if (!empty($fila['imagen_url']) && !in_array($fila['imagen_url'], $fila['galeria'])) {
+                array_unshift($fila['galeria'], $fila['imagen_url']);
+            }
+        }
+        echo json_encode($resultados);
+    }
+    
+    // 2. CREAR (POST sin ID)
+    elseif ($method === 'POST' && !$id) {
+        $imgPortada = guardarImagen($_FILES['imagen'] ?? null);
+        
+        try {
+            // Iniciamos transacción: O se guardan todas las fotos o ninguna
+            $pdo->beginTransaction();
+
+            // A. Insertamos la Actividad Principal
+            $sql = "INSERT INTO actividades (titulo, descripcion, categoria, imagen_url) VALUES (?, ?, ?, ?)";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+                $_POST['titulo'], 
+                $_POST['descripcion'] ?? '', 
+                $_POST['categoria'], 
+                $imgPortada
+            ]);
+            
+            // Obtenemos el ID de la actividad recién creada
+            $actividadId = $pdo->lastInsertId();
+
+            // B. Procesamos la Galería (Múltiples Archivos)
+            if (isset($_FILES['galeria'])) {
+                $totalFiles = count($_FILES['galeria']['name']);
+                $sqlGaleria = "INSERT INTO actividades_galeria (actividad_id, imagen_url) VALUES (?, ?)";
+                $stmtGaleria = $pdo->prepare($sqlGaleria);
+
+                for ($i = 0; $i < $totalFiles; $i++) {
+                    // Verificamos errores individuales
+                    if ($_FILES['galeria']['error'][$i] === UPLOAD_ERR_OK) {
+                        // Reconstruimos el array de archivo individual para usar la funcion guardarImagen
+                        $archivoUnico = [
+                            'name'     => $_FILES['galeria']['name'][$i],
+                            'type'     => $_FILES['galeria']['type'][$i],
+                            'tmp_name' => $_FILES['galeria']['tmp_name'][$i],
+                            'error'    => $_FILES['galeria']['error'][$i],
+                            'size'     => $_FILES['galeria']['size'][$i]
+                        ];
+                        
+                        $nombreGuardado = guardarImagen($archivoUnico);
+                        if ($nombreGuardado) {
+                            $stmtGaleria->execute([$actividadId, $nombreGuardado]);
+                        }
+                    }
+                }
+            }
+
+            $pdo->commit(); // Confirmamos cambios
+            echo json_encode(["message" => "Actividad creada con éxito", "id" => $actividadId]);
+
+        } catch (Exception $e) {
+            $pdo->rollBack(); // Si falla algo, deshacemos todo
+            http_response_code(500);
+            echo json_encode(["error" => $e->getMessage()]);
+        }
+    }
+
+    // 3. EDITAR (POST con ID)
+    elseif ($method === 'POST' && $id) {
+        // Nota: Esta es una edición básica, actualiza textos y portada.
+        // Las fotos nuevas de galería se AGREGAN a las que ya existen.
+        $img = guardarImagen($_FILES['imagen'] ?? null);
+        
+        try {
+            $pdo->beginTransaction();
+
+            $sql = "UPDATE actividades SET titulo=?, descripcion=?, categoria=?";
+            $params = [$_POST['titulo'], $_POST['descripcion'] ?? '', $_POST['categoria']];
+            
+            if ($img) {
+                $sql .= ", imagen_url=?";
+                $params[] = $img;
+            }
+            
+            $sql .= " WHERE id=?";
+            $params[] = $id;
+            
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+
+            // Insertar nuevas fotos a la galería si las enviaron
+            if (isset($_FILES['galeria'])) {
+                $totalFiles = count($_FILES['galeria']['name']);
+                $sqlGaleria = "INSERT INTO actividades_galeria (actividad_id, imagen_url) VALUES (?, ?)";
+                $stmtGaleria = $pdo->prepare($sqlGaleria);
+
+                for ($i = 0; $i < $totalFiles; $i++) {
+                    if ($_FILES['galeria']['error'][$i] === UPLOAD_ERR_OK) {
+                        $archivoUnico = [
+                            'name' => $_FILES['galeria']['name'][$i],
+                            'tmp_name' => $_FILES['galeria']['tmp_name'][$i],
+                            'error' => 0 // Asumimos OK si pasó el if
+                        ];
+                        // Nota simple para reusar guardarImagen sin todos los campos opcionales
+                        $nombreGuardado = guardarImagen($archivoUnico);
+                        if ($nombreGuardado) {
+                            $stmtGaleria->execute([$id, $nombreGuardado]);
+                        }
+                    }
+                }
+            }
+
+            $pdo->commit();
+            echo json_encode(["message" => "Actividad actualizada"]);
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            http_response_code(500);
+            echo json_encode(["error" => $e->getMessage()]);
+        }
+    }
+
+    // 4. ELIMINAR (DELETE)
+    elseif ($method === 'DELETE' && $id) {
+        // Gracias al ON DELETE CASCADE en la BD, al borrar esto se borra la galería sola
+        $stmt = $pdo->prepare("DELETE FROM actividades WHERE id=?");
+        $stmt->execute([$id]);
+        echo json_encode(["message" => "Actividad eliminada"]);
+    }
+}
 ?>

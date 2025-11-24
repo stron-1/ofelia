@@ -11,6 +11,7 @@ import { ActividadesPage } from './pages/ActividadesPage/ActividadesPage';
 import { ContactoPage } from './pages/ContactoPage/ContactoPage';
 import { AcademicoPage } from './pages/AcademicoPage/AcademicoPage';
 import { AcademicoIndex } from './pages/AcademicoPage/AcademicoIndex';
+import GestionActividadesPage from './pages/Admin/GestionActividadesPage';
 
 // Solo importamos Secundaria
 import { SecundariaInfo } from './pages/AcademicoPage/Secundaria/Info/SecundariaInfo';
@@ -64,6 +65,7 @@ const router = createBrowserRouter([
       { path: "secundaria", element: <GestionSecundariaPage /> },
       { path: "directivos", element: <GestionDirectivosPage /> },
       { path: "administrativos", element: <GestionAdministrativosPage /> },
+      {path: "actividades", element: <GestionActividadesPage /> },
     ]
   }
 ]);

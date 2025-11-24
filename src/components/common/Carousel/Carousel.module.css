@@ -1,41 +1,69 @@
 .carouselContainer {
   width: 100%;
+  height: 100%; /* Ahora llena el espacio que le dé el padre (Modal o Página) */
   margin-bottom: 0;
+  position: relative;
+  background-color: #000; /* Fondo negro elegante para fotos */
+  border-radius: 8px; /* Un toque suave en las esquinas */
+  overflow: hidden;
 }
 
 .slide {
-  height: 80vh; 
-  min-height: 350px; 
-  max-height: 650px; 
-  
   width: 100%;
-  background-color: #f0f0f0; 
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000;
 }
 
 .slideImg {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain; /* CRUCIAL: Muestra la foto entera sin recortarla */
 }
 
+/* --- ESTILOS DE LOS BOTONES DE NAVEGACIÓN (SWIPER) --- */
 .carouselContainer :global(.swiper-button-next),
 .carouselContainer :global(.swiper-button-prev) {
-  color: var(--color-accent) !important;
-  opacity: 0.8;
-  transition: opacity 0.3s ease;
+  color: white !important; /* Blancos para que se vean sobre fotos oscuras */
+  opacity: 0.6;
+  transition: opacity 0.3s ease, transform 0.2s ease;
+  background: rgba(0, 0, 0, 0.3); /* Fondo semitransparente para mejor lectura */
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ajuste para que las flechas se vean centradas dentro del círculo */
+.carouselContainer :global(.swiper-button-next)::after,
+.carouselContainer :global(.swiper-button-prev)::after {
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
 .carouselContainer :global(.swiper-button-next:hover),
 .carouselContainer :global(.swiper-button-prev:hover) {
   opacity: 1;
+  background: rgba(0, 0, 0, 0.6);
+  transform: scale(1.1);
 }
 
+/* --- PUNTOS DE PAGINACIÓN --- */
 .carouselContainer :global(.swiper-pagination-bullet) {
   background-color: rgba(255, 255, 255, 0.8);
-  opacity: 1;
+  opacity: 0.5;
+  width: 10px;
+  height: 10px;
+  transition: all 0.3s ease;
 }
 
 .carouselContainer :global(.swiper-pagination-bullet-active) {
-  background-color: var(--color-accent) !important;
+  background-color: var(--color-accent, #efb810) !important; /* Usa tu color dorado/accent */
+  opacity: 1;
+  transform: scale(1.2);
 }

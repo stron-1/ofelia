@@ -3,7 +3,8 @@ import './SpotlightCard.css';
 
 interface SpotlightCardProps extends React.PropsWithChildren {
   className?: string;
-  spotlightColor?: `rgba(${number}, ${number}, ${number}, ${number})`;
+  // CAMBIO AQUÍ: Ponemos 'string' para que acepte cualquier color
+  spotlightColor?: string; 
 }
 
 const SpotlightCard: React.FC<SpotlightCardProps> = ({

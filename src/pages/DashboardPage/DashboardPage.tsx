@@ -47,6 +47,12 @@ export function DashboardPage() {
             {isSidebarOpen && <span className={styles.linkText}>Administrativos</span>}
           </NavLink>
 
+          {/* Actividades (NUEVO) */}
+          <NavLink to="/admin/actividades" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>
+            <span className="material-symbols-outlined">celebration</span>
+            {isSidebarOpen && <span className={styles.linkText}>Actividades</span>}
+          </NavLink>
+
         </nav>
         <div className={styles.logoutSection}>
           <button onClick={handleLogout} className={styles.logoutButton}>
