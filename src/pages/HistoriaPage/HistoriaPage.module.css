@@ -93,13 +93,11 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  position: absolute;
+  top: 5px
+
 }
 
-/* * --- ARREGLO CRÍTICO: "Domesticar" el CSS de CardSwap ---
- * Esto anula el 'position: absolute' del CardSwap.css 
- * y lo fuerza a quedarse dentro de nuestra cuadrícula.
- * ¡ESTA ES LA CORRECCIÓN PARA EL LAYOUT "INCOHERENTE"!
-*/
 .timelineVisual :global(.card-swap-container) {
   position: relative !important; /* Anula 'absolute' */
   transform: none !important; /* Anula 'translate' */
