@@ -34,6 +34,13 @@
   height: 50px;
   border-radius: 50%;
   object-fit: cover;
+  /* Añadido para animación: transición suave por si se usa transform */
+  transition: transform 0.4s ease-out; 
+}
+
+/* Añade la animación al pasar el mouse sobre el enlace (navbarLogo) */
+.navbarLogo:hover .logoImage {
+  animation: spin 0.8s ease-in-out 1;
 }
 
 .logoTextFull {
@@ -172,5 +179,15 @@
 
   .navLink.active::after {
     width: 100%;
+  }
+}
+
+/* --- NUEVA ANIMACIÓN DE GIRO --- */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
