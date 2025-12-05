@@ -21,7 +21,10 @@
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover; /* CRUCIAL: Muestra la foto entera sin recortarla */
+  object-fit: cover; /* Asegura que llene todo */
+  /* El filtro blur desenfoca y brightness oscurece para que el texto resalte */
+  filter: blur(3px) brightness(0.6); 
+  transform: scale(1.05); /* Escala un poco para evitar bordes blancos por el desenfoque */
 }
 
 /* --- ESTILOS DE LOS BOTONES DE NAVEGACIÓN (SWIPER) --- */
@@ -66,4 +69,34 @@
   background-color: var(--color-accent, #efb810) !important; /* Usa tu color dorado/accent */
   opacity: 1;
   transform: scale(1.2);
+}
+
+.heroOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;       /* Usamos Flexbox para centrar */
+  align-items: center; /* Centrado vertical */
+  justify-content: center; /* Centrado horizontal */
+  z-index: 10;         /* Asegura que esté por encima de las fotos */
+  pointer-events: none; /* Permite dar clic a las flechas del carrusel a través del texto */
+  padding: 0 20px;
+}
+
+.heroTitle {
+  color: #ffffff;
+  font-size: 3rem;     /* Tamaño grande tipo portada */
+  font-weight: 700;
+  text-align: center;
+  text-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Sombra para lectura perfecta */
+  font-family: var(--font-heading, sans-serif); /* Usa tu fuente principal */
+  max-width: 900px;
+  animation: fadeIn 1.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }

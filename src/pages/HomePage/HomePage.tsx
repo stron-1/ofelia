@@ -21,14 +21,14 @@ export function HomePage() {
 
   return (
     <>
-      {/* 3. Pasamos las imágenes al Carrusel */}
-      {/* Usamos height "80vh" para que se vea grande e impactante como antes */}
-      <Carousel images={heroImages} height="80vh" />
+      {/* 3. Carrusel ajustado a la altura de la pantalla con el título dentro */}
+      {/* Usamos calc(100vh - 80px) para llenar el espacio restando la altura de una navbar típica */}
+      <Carousel images={heroImages} height="calc(100vh - 80px)" />
 
       <div className="page-container">
         
         <section className={styles.welcomeSection}>
-          <h2>Bienvenidos a la I.E. Ofelia Velásquez</h2>
+          {/* El título "Bienvenidos..." FUE ELIMINADO de aquí porque ahora está en el Carrusel */}
           <div className={styles.directorMessage}>
             <p>
               <strong>Un Mensaje de Nuestro Director:</strong> "Con gran alegría,

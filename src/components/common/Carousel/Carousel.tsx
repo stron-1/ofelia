@@ -14,7 +14,6 @@ interface CarouselProps {
   height?: string;
 }
 
-// CAMBIO AQUÍ: Usamos 'export function' en lugar de 'default' para corregir el error de importación
 export function Carousel({ 
   images, 
   autoPlay = true, 
@@ -28,6 +27,14 @@ export function Carousel({
 
   return (
     <div className={styles.carouselContainer} style={{ width, height }}>
+      
+      {/*Título de portada superpuesto*/}
+      <div className={styles.heroOverlay}>
+        <h1 className={styles.heroTitle}>
+          Bienvenidos a la I.E. Ofelia Velásquez
+        </h1>
+      </div>
+
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
         spaceBetween={0}
