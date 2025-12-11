@@ -11,7 +11,11 @@ import { ActividadesPage } from './pages/ActividadesPage/ActividadesPage';
 import { ContactoPage } from './pages/ContactoPage/ContactoPage';
 import { AcademicoPage } from './pages/AcademicoPage/AcademicoPage';
 import { AcademicoIndex } from './pages/AcademicoPage/AcademicoIndex';
+
+// --- IMPORTACIONES DE ADMIN ---
 import GestionActividadesPage from './pages/Admin/GestionActividadesPage';
+// Importamos la nueva página de Gestión de Contacto
+import GestionContactoPage from './pages/Admin/GestionContactoPage';
 
 // Solo importamos Secundaria
 import { SecundariaInfo } from './pages/AcademicoPage/Secundaria/Info/SecundariaInfo';
@@ -23,6 +27,7 @@ import { PersonalAdministrativo } from './pages/AcademicoPage/Personal/Administr
 import { ProtectedRoute } from './components/common/ProtectedRoute/ProtectedRoute';
 import { DashboardPage } from './pages/DashboardPage/DashboardPage';
 import { DashboardIndex } from './pages/Admin/DashboardIndex';
+
 // Solo importamos gestiones de Secundaria y Personal
 import { GestionSecundariaPage } from './pages/Admin/GestionSecundariaPage';
 import { GestionDirectivosPage } from './pages/Admin/GestionDirectivosPage';
@@ -43,7 +48,6 @@ const router = createBrowserRouter([
         element: <AcademicoPage />,
         children: [
           { index: true, element: <AcademicoIndex /> },
-          // Eliminadas rutas de Primaria
           { path: "secundaria-info", element: <SecundariaInfo /> },
           { path: "secundaria-galeria", element: <GaleriaSecundaria /> },
           { path: "directivos", element: <PersonalDirectivo /> },
@@ -65,7 +69,8 @@ const router = createBrowserRouter([
       { path: "secundaria", element: <GestionSecundariaPage /> },
       { path: "directivos", element: <GestionDirectivosPage /> },
       { path: "administrativos", element: <GestionAdministrativosPage /> },
-      {path: "actividades", element: <GestionActividadesPage /> },
+      { path: "actividades", element: <GestionActividadesPage /> },
+      { path: "mensajes", element: <GestionContactoPage /> },
     ]
   }
 ]);

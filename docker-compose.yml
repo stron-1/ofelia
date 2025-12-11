@@ -23,6 +23,7 @@ services:
       - "8000:80" # Puedes acceder directo por localhost:8000 si quieres
     volumes:
       - ./backend:/var/www/html
+      - ./backend/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini # Configuración PHP para subir archivos grandes
     working_dir: /var/www/html
     # Instalamos driver MySQL y activamos Apache
     command: >

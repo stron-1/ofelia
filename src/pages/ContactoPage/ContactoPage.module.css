@@ -1,160 +1,179 @@
+/* Párrafo introductorio */
 .introParagraph {
   font-size: 1.1rem;
   text-align: center;
   max-width: 800px;
   margin: 0 auto 3rem auto;
+  color: #555;
 }
 
-.contactoLayout {
+/* --- GRID PRINCIPAL DE 3 COLUMNAS --- */
+.contactGrid {
   display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 3rem;
-  background-color: var(--color-white);
-  padding: 3rem;
+  /* 3 columnas iguales. Si la pantalla es pequeña, se ajusta automáticamente */
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 2rem; /* Separación entre tarjetas */
+  align-items: stretch; /* Hace que todas tengan la misma altura */
+  margin-bottom: 3rem;
+}
+
+/* En tablets (menos de 1024px), pasamos a 2 columnas o 1 */
+@media (max-width: 1024px) {
+  .contactGrid {
+    grid-template-columns: 1fr; /* Una sola columna en móviles/tablets verticales */
+  }
+}
+
+/* --- ESTILO DE TARJETA GENÉRICA (CARD) --- */
+.card {
+  background: var(--color-white);
+  padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Ocupa toda la altura disponible */
 }
 
-.infoColumna h2 {
+/* Títulos de las tarjetas */
+.cardTitle {
   margin-top: 0;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+  color: var(--color-primary);
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  text-align: center;
+  border-bottom: 2px solid var(--color-accent);
+  padding-bottom: 10px;
+  display: inline-block;
+  align-self: center; /* Centrar el título en la tarjeta */
 }
 
-/* --- NUEVOS ESTILOS: Items de Información con Iconos --- */
-/* (Reemplaza .infoLista) */
+/* --- COLUMNA 1: INFORMACIÓN --- */
 .infoItem {
   display: flex;
   align-items: flex-start;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .infoIcon {
-  font-size: 2.5rem;
+  font-size: 1.5rem;
   color: var(--color-accent);
-  margin-top: 5px;
+  margin-top: 2px;
   flex-shrink: 0;
 }
 
 .infoText h4 {
   margin: 0 0 0.25rem 0;
   color: var(--color-primary);
-  font-family: var(--font-heading);
-  font-size: 1.2rem;
+  font-size: 1rem;
 }
 
 .infoText p {
   margin: 0;
-  font-size: 1.05rem;
-  line-height: 1.6;
-  color: var(--color-text);
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.4;
 }
 
-/* --- SECCIÓN DE FORMULARIO (Botón Modificado) --- */
-.formColumna h2 {
-  margin-top: 0;
+/* --- COLUMNA 2: FORMULARIO --- */
+.contactForm {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Para que ocupe el espacio vertical */
 }
 
 .formGroup {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.2rem;
 }
 
 .formGroup label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 700;
-  color: var(--color-primary);
+  color: #333;
+  font-size: 0.9rem;
 }
 
 .formGroup input,
 .formGroup textarea {
   width: 100%;
-  padding: 0.8rem 1rem;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
   font-family: var(--font-body);
-  font-size: 1rem;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  font-size: 0.95rem;
+  transition: border-color 0.3s;
 }
 
 .formGroup input:focus,
 .formGroup textarea:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(106, 141, 175, 0.3);
+  box-shadow: 0 0 0 3px rgba(1, 75, 160, 0.1);
 }
 
-/* --- ESTILO MODIFICADO: Botón de Envío (CTA) --- */
 .submitBtn {
+  margin-top: auto; /* Empuja el botón al final si sobra espacio */
   width: 100%;
-  padding: 1rem;
+  padding: 0.8rem;
   border: none;
   border-radius: 8px;
-  background-color: var(--color-accent); /* <-- CAMBIADO */
-  color: var(--color-primary); /* <-- CAMBIADO */
-  font-family: var(--font-heading);
-  font-size: 1.1rem;
+  background-color: var(--color-primary);
+  color: var(--color-white);
   font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  transition: background 0.3s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .submitBtn:hover {
-  background-color: #d6a40e; /* Dorado más oscuro */
-  transform: scale(1.02);
+  background-color: #003a80;
+  transform: translateY(-2px);
 }
 
-/* --- NUEVOS ESTILOS: Sección de Mapa --- */
-.mapSection {
-  margin-top: 3rem;
-  text-align: center;
-}
-
-.mapEmbed {
-  border-radius: 12px;
+/* --- COLUMNA 3: MAPA --- */
+.mapWrapper {
+  width: 100%;
+  flex-grow: 1; /* El mapa crece para llenar la tarjeta */
+  min-height: 300px; /* Altura mínima para que se vea bien */
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  margin-top: 2rem;
   border: 1px solid #eee;
 }
 
-.mapEmbed iframe {
+.mapWrapper iframe {
   width: 100%;
-  height: 400px;
+  height: 100%;
   border: 0;
-  display: block; /* Elimina espacio en blanco fantasma */
+  display: block;
 }
+
+/* Botón Admin */
 .adminLoginWrapper {
   text-align: center;
-  padding: 2rem 0;
-  margin-top: 2rem;
+  margin-top: 5rem;
+  padding-top: 1rem;
   border-top: 1px solid #eee;
-  border-bottom: 1px solid #eee;
 }
 
 .adminLoginBtn {
-  background-color: transparent;
-  border: 2px solid var(--color-primary);
-  color: var(--color-primary);
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 1rem;
+  background: none;
+  border: 1px solid #ddd;
+  padding: 8px 16px;
+  border-radius: 20px;
+  color: #888;
+  font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .adminLoginBtn:hover {
-  background-color: var(--color-primary);
-  color: var(--color-white);
-  transform: scale(1.05);
-}
-
-/* --- Responsive --- */
-@media (max-width: 992px) {
-  .contactoLayout {
-    grid-template-columns: 1fr;
-    padding: 2rem;
-  }
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }

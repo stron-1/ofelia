@@ -162,6 +162,7 @@ if ($tabla) {
 if ($route === 'actividades') {
     // 1. LISTAR (GET) - Con JOIN para traer la galería
     if ($method === 'GET') {
+        $pdo->exec("SET SESSION group_concat_max_len = 1000000");
         $categoria = $_GET['categoria'] ?? null;
         
         // Hacemos LEFT JOIN para traer las fotos de la galería concatenadas
@@ -314,4 +315,47 @@ if ($route === 'actividades') {
         echo json_encode(["message" => "Actividad eliminada"]);
     }
 }
+
+    // RUTA DE CONTACTO
+    elseif ($route === 'contacto') {
+        
+        $inputJSON = json_decode(file_get_contents('php://input'), true);
+        
+        if ($method === 'GET') {
+            $stmt = $pdo->prepare("SELECT * FROM mensajes_contacto ORDER BY fecha DESC");
+            $stmt->execute();
+            echo json_encode($stmt->fetchAll());
+        }
+
+        elseif ($method === 'POST' && empty($id)) { 
+            $nombre = $inputJSON['nombre'] ?? $_POST['nombre'] ?? '';
+            $email = $inputJSON['email'] ?? $_POST['email'] ?? '';
+            $telefono = $inputJSON['telefono'] ?? $_POST['telefono'] ?? '';
+            $mensaje = $inputJSON['mensaje'] ?? $_POST['mensaje'] ?? '';
+
+            if (empty($nombre) || empty($email) || empty($mensaje)) {
+                http_response_code(400);
+                echo json_encode(["error" => "Nombre, email y mensaje son obligatorios"]);
+                exit;
+            }
+
+            $stmt = $pdo->prepare("INSERT INTO mensajes_contacto (nombre, email, telefono, mensaje) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$nombre, $email, $telefono, $mensaje]);
+            
+            echo json_encode(["message" => "Mensaje enviado correctamente"]);
+        }
+
+        elseif (($method === 'PUT' || ($method === 'POST' && $id))) {
+            $stmt = $pdo->prepare("UPDATE mensajes_contacto SET leido = 1 WHERE id = ?");
+            $stmt->execute([$id]);
+            echo json_encode(["message" => "Mensaje marcado como leído"]);
+        }
+
+        // D. ELIMINAR (DELETE)
+        elseif ($method === 'DELETE' && $id) {
+            $stmt = $pdo->prepare("DELETE FROM mensajes_contacto WHERE id = ?");
+            $stmt->execute([$id]);
+            echo json_encode(["message" => "Mensaje eliminado"]);
+        }
+    }
 ?>

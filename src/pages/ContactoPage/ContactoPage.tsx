@@ -1,44 +1,73 @@
-// --- 1. IMPORTAR useState y el nuevo Modal ---
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { LoginModal } from '../../components/common/LoginModal';
-// ---------------------------------------------
-
+import { contactoService } from '../../api/services/contactoService'; 
 import styles from './ContactoPage.module.css';
 
-// Importamos los iconos
 import {
   BsGeoAlt,
   BsTelephone,
   BsEnvelope,
   BsClock,
+  BsSend
 } from 'react-icons/bs';
 
 export function ContactoPage() {
-  
-  // --- 2. AÑADIR ESTADO PARA EL MODAL ---
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // ---------------------------------------
+
+  // Estados del formulario
+  const [formData, setFormData] = useState({
+    nombre: '',
+    email: '',
+    mensaje: ''
+  });
+  
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setStatus('idle');
+
+    try {
+      await contactoService.create(formData);
+      setStatus('success');
+      setFormData({ nombre: '', email: '', mensaje: '' });
+    } catch (error) {
+      console.error(error);
+      setStatus('error');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <> {/* Usamos un Fragment para incluir el modal fuera del page-container si es necesario */}
+    <> 
       <div className="page-container">
-        <h1>Ponte en Contacto con Nosotros</h1>
+        <h1>Ponte en Contacto</h1>
         <p className={styles.introParagraph}>
-          Si tienes alguna consulta, deseas más información o quieres coordinar una
-          visita, no dudes en comunicarte a través de nuestros canales.
+          Estamos aquí para atenderte. Encuentra nuestra información, escríbenos un mensaje o visítanos.
         </p>
 
-        {/* Layout (Sin cambios) */}
-        <div className={styles.contactoLayout}>
+        {/* --- GRID DE 3 TARJETAS --- */}
+        <div className={styles.contactGrid}>
           
-          {/* COLUMNA DE INFORMACIÓN (Sin cambios) */}
-          <div className={styles.infoColumna}>
-            <h2>Información de Contacto</h2>
+          {/* TARJETA 1: INFORMACIÓN */}
+          <div className={styles.card}>
+            <h3 className={styles.cardTitle}>Información</h3>
+            
             <div className={styles.infoItem}>
               <div className={styles.infoIcon}><BsGeoAlt /></div>
               <div className={styles.infoText}>
                 <h4>Dirección</h4>
-                <p>Jr. Alfonso Ugarte Cdr 1, Tarapoto, San Martín, Perú.</p>
+                <p>Jr. Alfonso Ugarte Cdr 1, Tarapoto, San Martín.</p>
               </div>
             </div>
             
@@ -54,7 +83,7 @@ export function ContactoPage() {
               <div className={styles.infoIcon}><BsEnvelope /></div>
               <div className={styles.infoText}>
                 <h4>Correo</h4>
-                <p>mesadepartes@ieofeliavelasquez.com</p>
+                <p>informes@ieofeliavelasquez.edu.pe</p>
               </div>
             </div>
 
@@ -62,84 +91,111 @@ export function ContactoPage() {
               <div className={styles.infoIcon}><BsClock /></div>
               <div className={styles.infoText}>
                 <h4>Horario</h4>
-                <p>Lunes a Viernes de 7:00 AM a 6:00 PM.</p>
+                <p>Lun - Vie: 7:00 AM - 6:00 PM</p>
               </div>
             </div>
           </div>
 
-          {/* COLUMNA DE FORMULARIO (Sin cambios) */}
-          <div className={styles.formColumna}>
-            <h2>Envíanos un Mensaje</h2>
-            <form className={styles.contactForm}>
-              {/* ... campos del formulario sin cambios ... */}
+          {/* TARJETA 2: FORMULARIO */}
+          <div className={styles.card}>
+            <h3 className={styles.cardTitle}>Escríbenos</h3>
+            <form className={styles.contactForm} onSubmit={handleSubmit}>
+              
               <div className={styles.formGroup}>
-                <label htmlFor="name">Nombre completo</label>
+                <label htmlFor="nombre">Nombre completo</label>
                 <input
                   type="text"
-                  id="name"
-                  name="name"
-                  placeholder="Tu nombre y apellido"
+                  id="nombre"
+                  name="nombre"
+                  value={formData.nombre}
+                  onChange={handleChange}
+                  placeholder="Tu nombre"
+                  required
                 />
               </div>
+
               <div className={styles.formGroup}>
                 <label htmlFor="email">Correo electrónico</label>
                 <input
                   type="email"
                   id="email"
                   name="email"
-                  placeholder="ejemplo@correo.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="tucorreo@ejemplo.com"
+                  required
                 />
               </div>
+
               <div className={styles.formGroup}>
-                <label htmlFor="message">Mensaje</label>
+                <label htmlFor="mensaje">Mensaje</label>
                 <textarea
-                  id="message"
-                  name="message"
-                  rows={5}
-                  placeholder="Escribe tu consulta aquí..."
+                  id="mensaje"
+                  name="mensaje"
+                  value={formData.mensaje}
+                  onChange={handleChange}
+                  rows={4}
+                  placeholder="¿En qué podemos ayudarte?"
+                  required
                 ></textarea>
               </div>
-              <button type="submit" className={styles.submitBtn}>
-                Enviar Mensaje
+
+              <button 
+                type="submit" 
+                className={styles.submitBtn}
+                disabled={loading}
+                style={{ opacity: loading ? 0.7 : 1 }}
+              >
+                {loading ? 'Enviando...' : <><BsSend /> Enviar</>}
               </button>
+
+              {status === 'success' && (
+                <p style={{ color: 'green', marginTop: '1rem', textAlign:'center', fontSize:'0.9rem' }}>
+                  ¡Mensaje enviado!
+                </p>
+              )}
+              {status === 'error' && (
+                <p style={{ color: 'red', marginTop: '1rem', textAlign:'center', fontSize:'0.9rem' }}>
+                  Error al enviar.
+                </p>
+              )}
             </form>
           </div>
+
+          {/* TARJETA 3: UBICACIÓN */}
+          <div className={styles.card}>
+            <h3 className={styles.cardTitle}>Ubicación</h3>
+            <div className={styles.mapWrapper}>
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d660.0646239042999!2d-76.36223845103878!3d-6.486798026910776!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91ba0c07c1219c61%3A0x2d69843d6c088011!2sEducational%20Institution%20Ofelia%20Velasquez!5e1!3m2!1sen!2spe!4v1761471819387!5m2!1sen!2spe"
+                width="100%"
+                height="100%"
+                title="Mapa Ubicación"
+                allowFullScreen={true}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
+            </div>
+          </div>
+
         </div>
 
-        {/* --- 3. NUEVA SECCIÓN DE LOGIN DE ADMIN (ANTES DEL MAPA) --- */}
+        {/* LOGIN ADMIN */}
         <section className={styles.adminLoginWrapper}>
           <button
             className={styles.adminLoginBtn}
-            onClick={() => setIsModalOpen(true)} // Abre el modal
+            onClick={() => setIsModalOpen(true)}
           >
             Acceder al Modo Administrador
           </button>
         </section>
-        {/* ----------------------------------------------------------- */}
 
-        {/* Sección de Mapa (Sin cambios) */}
-        <section className={styles.mapSection}>
-          <h2>Nuestra Ubicación</h2>
-          <div className={styles.mapEmbed}>
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d660.0646239042999!2d-76.36223845103878!3d-6.486798026910776!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91ba0c07c1219c61%3A0x2d69843d6c088011!2sEducational%20Institution%20Ofelia%20Velasquez!5e1!3m2!1sen!2spe!4v1761471819387!5m2!1sen!2spe"
-              width="600"
-              height="450"
-              style={{ border: 0 }}
-              allowFullScreen={true}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            ></iframe>
-          </div>
-        </section>
       </div>
 
-      {/* --- 4. RENDERIZAR EL MODAL (Fuera del page-container) --- */}
       <LoginModal 
         isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} // Pasa la función para cerrarlo
+        onClose={() => setIsModalOpen(false)} 
       />
-      {/* --------------------------------------------------------- */}
     </>
   );
 }

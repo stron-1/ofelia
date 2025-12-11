@@ -3,13 +3,17 @@ import styles from './ActividadesPage.module.css';
 import SpotlightCard from '../../components/ui/SpotlightCard';
 import { actividadesService, type Actividad } from '../../api/services/actividadesService';
 import { IMAGE_BASE_URL } from '../../api/apiClient';
-import { Carousel } from '../../components/common/Carousel';
-import { BsX, BsImages } from 'react-icons/bs';
+// Eliminamos la importación del Carousel de common
+import { BsX, BsImages, BsChevronLeft, BsChevronRight } from 'react-icons/bs';
 
 export function ActividadesPage() {
   const [actividades, setActividades] = useState<Actividad[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Estado para el modal
   const [selectedActividad, setSelectedActividad] = useState<Actividad | null>(null);
+  // Estado para el carrusel interno del modal
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // 1. Cargar datos
   useEffect(() => {
@@ -26,6 +30,13 @@ export function ActividadesPage() {
     loadData();
   }, []);
 
+  // Resetear el índice del carrusel cuando se abre una nueva actividad
+  useEffect(() => {
+    if (selectedActividad) {
+      setCurrentImageIndex(0);
+    }
+  }, [selectedActividad]);
+
   // 2. Helper para URLs de imágenes
   const getImageUrl = (path: string | undefined | null) => {
     if (!path || path === 'null' || path === '') return null;
@@ -38,6 +49,17 @@ export function ActividadesPage() {
     return `${IMAGE_BASE_URL}uploads/${cleanPath}`;
   };
 
+  // --- LÓGICA DEL CARRUSEL INTERNO ---
+  const handleNext = (total: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev === total - 1 ? 0 : prev + 1));
+  };
+
+  const handlePrev = (total: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev === 0 ? total - 1 : prev - 1));
+  };
+
   if (loading) return <div style={{textAlign:'center', padding:'4rem'}}>Cargando eventos...</div>;
 
   return (
@@ -47,13 +69,12 @@ export function ActividadesPage() {
         Revive los mejores momentos de nuestra comunidad educativa
       </p>
 
-      {/* --- GRID UNIFICADO (3 Columnas) --- */}
+      {/* --- GRID UNIFICADO --- */}
       {actividades.length > 0 ? (
         <div className={styles.gridContainer}>
           {actividades.map((act) => {
             const imgUrl = getImageUrl(act.imagen_url);
-            // Contamos fotos: galería + portada
-            const totalFotos = (act.galeria?.length || 0) + (act.imagen_url ? 1 : 0);
+            const totalFotos = act.galeria?.length || 0;
 
             return (
               <div key={act.id} onClick={() => setSelectedActividad(act)}>
@@ -64,7 +85,7 @@ export function ActividadesPage() {
                     {imgUrl ? (
                       <img src={imgUrl} alt={act.titulo} className={styles.cardImage} />
                     ) : (
-                      <div style={{width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', color:'#999'}}>
+                      <div className={styles.noImagePlaceholder}>
                         Sin imagen
                       </div>
                     )}
@@ -90,59 +111,86 @@ export function ActividadesPage() {
           })}
         </div>
       ) : (
-        <div style={{textAlign:'center', padding:'3rem', background:'#f5f5f5', borderRadius:'12px'}}>
+        <div className={styles.emptyState}>
           <h3>No hay actividades publicadas aún.</h3>
           <p>Pronto subiremos fotos de nuestros eventos.</p>
         </div>
       )}
 
-      {/* --- MODAL DE DETALLE / CARRUSEL --- */}
+      {/* --- MODAL DE DETALLE (VISOR LIMPIO) --- */}
       {selectedActividad && (
         <div className={styles.modalOverlay} onClick={() => setSelectedActividad(null)}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            
+            {/* Botón cerrar */}
             <button className={styles.closeButton} onClick={() => setSelectedActividad(null)}>
               <BsX />
             </button>
 
+            {/* Header del Modal */}
             <div className={styles.modalHeader}>
-              <span style={{fontSize:'0.85rem', color:'#666', textTransform:'uppercase', letterSpacing:'1px'}}>
+              <span className={styles.modalCategory}>
                 {selectedActividad.categoria}
               </span>
               <h2 className={styles.modalTitle}>{selectedActividad.titulo}</h2>
             </div>
 
-            <div className={styles.carouselWrapper}>
+            {/* ÁREA DE VISUALIZACIÓN DE FOTOS (CARRUSEL LIMPIO) */}
+            <div className={styles.viewerContainer}>
               {(() => {
-                // Lógica combinada para juntar portada + galería
-                const rawGallery = selectedActividad.galeria && selectedActividad.galeria.length > 0 
+                // LÓGICA CORREGIDA: Usamos ESTRICTAMENTE la galería.
+                // No agregamos 'imagen_url' (portada) al array.
+                const galeriaCruda = selectedActividad.galeria && selectedActividad.galeria.length > 0 
                   ? selectedActividad.galeria 
-                  : (selectedActividad.imagen_url ? [selectedActividad.imagen_url] : []);
-                
-                // Limpiamos URLs
-                const galeriaUrls = rawGallery
+                  : [];
+
+                // Limpiamos las URLs usando tu función helper
+                const galeriaUrls = galeriaCruda
                   .map(url => getImageUrl(url))
                   .filter(url => url !== null) as string[];
 
+                // Solo mostramos el carrusel si hay fotos en la galería
                 if (galeriaUrls.length > 0) {
                   return (
-                    // AHORA SÍ FUNCIONARÁ PORQUE CAROUSEL ACEPTA 'IMAGES'
-                    <Carousel 
-                      images={galeriaUrls} 
-                      autoPlay={true}
-                      width="100%"
-                      height="100%" 
-                    />
+                    <>
+                      {/* Imagen Principal del Visor */}
+                      <div className={styles.imageWrapper}>
+                         <img 
+                           src={galeriaUrls[currentImageIndex]} 
+                           alt={`Foto ${currentImageIndex + 1}`} 
+                           className={styles.viewerImage} 
+                         />
+                      </div>
+
+                      {/* Controles de Navegación (Solo si hay más de 1 foto) */}
+                      {galeriaUrls.length > 1 && (
+                        <>
+                          <button className={`${styles.navBtn} ${styles.prevBtn}`} onClick={(e) => handlePrev(galeriaUrls.length, e)}>
+                            <BsChevronLeft />
+                          </button>
+                          <button className={`${styles.navBtn} ${styles.nextBtn}`} onClick={(e) => handleNext(galeriaUrls.length, e)}>
+                            <BsChevronRight />
+                          </button>
+                          
+                          {/* Contador simple */}
+                          <div className={styles.counterBadge}>
+                            {currentImageIndex + 1} / {galeriaUrls.length}
+                          </div>
+                        </>
+                      )}
+                    </>
                   );
                 } else {
-                  return <div style={{color:'white'}}>Sin imágenes disponibles</div>;
+                  // Si no hay galería, mostramos mensaje o la portada sola si quisieras, 
+                  // pero pediste que sea solo galería.
+                  return <div className={styles.noImagesMessage}>Esta actividad no tiene galería extra.</div>;
                 }
               })()}
             </div>
 
+            {/* Footer con descripción */}
             <div className={styles.modalFooter}>
-              <p style={{lineHeight: '1.6', color:'#444'}}>
-                {selectedActividad.descripcion}
-              </p>
+              <p>{selectedActividad.descripcion}</p>
             </div>
           </div>
         </div>

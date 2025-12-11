@@ -96,30 +96,25 @@ export default function GestionActividadesPage() {
     }
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    
     try {
       if (editingId) {
-        // Enviar datos + portada (si cambió) + galería (si hay nuevas)
-        await actividadesService.update(
-          editingId, 
-          formData, 
-          selectedFile || undefined, 
-          galleryFiles || null
-        );
+        await actividadesService.update(editingId, formData, selectedFile || undefined, galleryFiles);
       } else {
-        await actividadesService.create(
-          formData, 
-          selectedFile || undefined, 
-          galleryFiles || null
-        );
+        await actividadesService.create(formData, selectedFile || undefined, galleryFiles);
       }
-      handleCloseForm();
-      cargarActividades();
-    } catch {
-      alert('Error al guardar. Verifica la conexión o el tamaño de las imágenes.');
+      
+      alert('¡Guardado correctamente!');
+
+    } catch (error) {
+      console.error("Error reportado:", error);
+      alert('La operación está tardando más de lo esperado. Es posible que las imágenes se estén guardando en segundo plano. Verifica la lista en unos segundos.');
     } finally {
+      handleCloseForm();
+      await cargarActividades(); 
       setIsLoading(false);
     }
   };
@@ -136,83 +131,12 @@ export default function GestionActividadesPage() {
 
   return (
     <div className={styles.adminPageContainer}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <h2>Gestión de Actividades</h2>
         <button onClick={() => handleOpenForm()} className={styles.addButton}>
           <BsPlusCircle /> Nueva Actividad
         </button>
-      </div>
 
-      {isLoading && <p>Cargando...</p>}
-      
-      {/* --- TABLA --- */}
-      <table className={styles.adminTable}>
-        <thead>
-          <tr>
-            <th>Portada</th>
-            <th>Título</th>
-            <th>Categoría</th>
-            <th>Fotos Extra</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {actividades.map((act) => {
-            const imgUrl = getImageUrl(act.imagen_url);
-            // Calculamos cuántas fotos extra tiene (si el backend ya las mandó en el array 'galeria')
-            // Restamos 1 porque el array 'galeria' incluye la portada en nuestra lógica de PHP, a veces
-            const countExtras = act.galeria ? act.galeria.length : 0;
-
-            return (
-              <tr key={act.id}>
-                <td>
-                  {imgUrl ? (
-                    <img 
-                      src={imgUrl} 
-                      alt="Miniatura" 
-                      className={styles.tableImage} 
-                      onError={(e) => e.currentTarget.style.display = 'none'}
-                    />
-                  ) : (
-                    <div className={styles.tableImage} style={{ background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>
-                      Sin Foto
-                    </div>
-                  )}
-                </td>
-                <td style={{ fontWeight: 'bold' }}>{act.titulo}</td>
-                <td>
-                  <span style={{ padding: '4px 8px', borderRadius: '4px', background: '#eef2ff', color: '#004aa0', fontSize: '0.85rem' }}>
-                    {act.categoria}
-                  </span>
-                </td>
-                <td>
-                    {/* Indicador de galería */}
-                    {countExtras > 0 ? (
-                        <span style={{fontSize: '0.8rem', color: '#666'}}>
-                            {countExtras > 1 ? `${countExtras} fotos` : '1 foto'}
-                        </span>
-                    ) : '-'}
-                </td>
-                <td className={styles.actionsCell}>
-                  <button onClick={() => handleOpenForm(act)} className={styles.editBtn}>
-                    <BsPencil />
-                  </button>
-                  <button onClick={() => handleDelete(act.id!)} className={styles.deleteBtn}>
-                    <BsTrash />
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-          {actividades.length === 0 && !isLoading && (
-            <tr>
-              <td colSpan={5} style={{ textAlign: 'center', padding: '2rem' }}>No hay actividades registradas.</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-
-      {/* --- MODAL / FORMULARIO --- */}
+              {/* --- MODAL / FORMULARIO --- */}
       {isFormOpen && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
@@ -295,6 +219,77 @@ export default function GestionActividadesPage() {
           </div>
         </div>
       )}
+
+      {isLoading && <p>Cargando...</p>}
+      
+      {/* --- TABLA --- */}
+      <table className={styles.adminTable}>
+        <thead>
+          <tr>
+            <th>Portada</th>
+            <th>Título</th>
+            <th>Categoría</th>
+            <th>Fotos Extra</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {actividades.map((act) => {
+            const imgUrl = getImageUrl(act.imagen_url);
+            // Calculamos cuántas fotos extra tiene (si el backend ya las mandó en el array 'galeria')
+            // Restamos 1 porque el array 'galeria' incluye la portada en nuestra lógica de PHP, a veces
+            const countExtras = act.galeria ? act.galeria.length : 0;
+
+            return (
+              <tr key={act.id}>
+                <td>
+                  {imgUrl ? (
+                    <img 
+                      src={imgUrl} 
+                      alt="Miniatura" 
+                      className={styles.tableImage} 
+                      onError={(e) => e.currentTarget.style.display = 'none'}
+                    />
+                  ) : (
+                    <div className={styles.tableImage} style={{ background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>
+                      Sin Foto
+                    </div>
+                  )}
+                </td>
+                <td style={{ fontWeight: 'bold' }}>{act.titulo}</td>
+                <td>
+                  <span style={{ padding: '4px 8px', borderRadius: '4px', background: '#eef2ff', color: '#004aa0', fontSize: '0.85rem' }}>
+                    {act.categoria}
+                  </span>
+                </td>
+                <td>
+                    {/* Indicador de galería */}
+                    {countExtras > 0 ? (
+                        <span style={{fontSize: '0.8rem', color: '#666'}}>
+                            {countExtras > 1 ? `${countExtras} fotos` : '1 foto'}
+                        </span>
+                    ) : '-'}
+                </td>
+                <td className={styles.actionsCell}>
+                  <button onClick={() => handleOpenForm(act)} className={styles.editBtn}>
+                    <BsPencil />
+                  </button>
+                  <button onClick={() => handleDelete(act.id!)} className={styles.deleteBtn}>
+                    <BsTrash />
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+          {actividades.length === 0 && !isLoading && (
+            <tr>
+              <td colSpan={5} style={{ textAlign: 'center', padding: '2rem' }}>No hay actividades registradas.</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+
+
     </div>
   );
 }

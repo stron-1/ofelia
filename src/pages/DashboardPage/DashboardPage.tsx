@@ -23,34 +23,34 @@ export function DashboardPage() {
         </div>
         <nav className={styles.navMenu}>
           
-          {/* Inicio */}
           <NavLink to="/admin/dashboard" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`} end>
             <span className="material-symbols-outlined">home</span>
             {isSidebarOpen && <span className={styles.linkText}>Inicio</span>}
           </NavLink>
           
-          {/* Secundaria */}
           <NavLink to="/admin/secundaria" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>
             <span className="material-symbols-outlined">menu_book</span>
             {isSidebarOpen && <span className={styles.linkText}>Secundaria</span>}
           </NavLink>
 
-          {/* Directivos (NUEVO) */}
           <NavLink to="/admin/directivos" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>
             <span className="material-symbols-outlined">supervisor_account</span>
             {isSidebarOpen && <span className={styles.linkText}>Directivos</span>}
           </NavLink>
 
-          {/* Administrativos (NUEVO) */}
           <NavLink to="/admin/administrativos" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>
             <span className="material-symbols-outlined">support_agent</span>
             {isSidebarOpen && <span className={styles.linkText}>Administrativos</span>}
           </NavLink>
 
-          {/* Actividades (NUEVO) */}
           <NavLink to="/admin/actividades" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>
             <span className="material-symbols-outlined">celebration</span>
             {isSidebarOpen && <span className={styles.linkText}>Actividades</span>}
+          </NavLink>
+
+          <NavLink to="/admin/mensajes" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>
+            <span className="material-symbols-outlined">mail</span>
+            {isSidebarOpen && <span className={styles.linkText}>Mensajes</span>}
           </NavLink>
 
         </nav>
