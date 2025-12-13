@@ -52,10 +52,15 @@ if ($route === 'login' && $method === 'POST') {
 
     if ($user && password_verify($input['password'], $user['password_hash'])) {
         echo json_encode([
-            "message" => "Login exitoso",
-            "token" => "token_dummy_" . time(),
-            "user" => ["id" => $user['id'], "nombre" => $user['nombre'], "email" => $user['email']]
-        ]);
+                    "message" => "Login exitoso",
+                    "token" => bin2hex(random_bytes(16)), 
+                    "user" => [
+                        "id" => $user['id'],
+                        "nombre" => $user['nombre'],
+                        "email" => $user['email'],
+                        "imagen_url" => $user['imagen_url']
+                    ]
+                ]);
     } else {
         http_response_code(401);
         echo json_encode(["error" => "Credenciales incorrectas"]);
@@ -356,6 +361,144 @@ if ($route === 'actividades') {
             $stmt = $pdo->prepare("DELETE FROM mensajes_contacto WHERE id = ?");
             $stmt->execute([$id]);
             echo json_encode(["message" => "Mensaje eliminado"]);
+        }
+    }
+
+    elseif ($route === 'galeria') {
+        
+        // A. OBTENER FOTOS DE UNA ACTIVIDAD (Con ID para poder borrar)
+        if ($method === 'GET' && isset($_GET['actividad_id'])) {
+            $stmt = $pdo->prepare("SELECT id, imagen_url FROM actividades_galeria WHERE actividad_id = ?");
+            $stmt->execute([$_GET['actividad_id']]);
+            echo json_encode($stmt->fetchAll());
+        }
+
+        // B. ELIMINAR UNA FOTO ESPECÍFICA DE LA GALERÍA
+        elseif ($method === 'DELETE' && $id) {
+            // 1. Obtener nombre para borrar archivo físico
+            $stmt = $pdo->prepare("SELECT imagen_url FROM actividades_galeria WHERE id = ?");
+            $stmt->execute([$id]);
+            $foto = $stmt->fetch();
+
+            if ($foto) {
+                $rutaArchivo = 'uploads/' . $foto['imagen_url'];
+                if (file_exists($rutaArchivo)) {
+                    unlink($rutaArchivo); // Borrar archivo
+                }
+                // 2. Borrar de BD
+                $stmt = $pdo->prepare("DELETE FROM actividades_galeria WHERE id = ?");
+                $stmt->execute([$id]);
+                echo json_encode(["message" => "Foto eliminada"]);
+            } else {
+                http_response_code(404);
+                echo json_encode(["error" => "Foto no encontrada"]);
+            }
+        }
+    }
+
+    // ==========================================
+    // 7. ELIMINAR PORTADA (NUEVO)
+    // ==========================================
+    elseif ($route === 'eliminar_portada' && $method === 'POST') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        $actividad_id = $data['id'] ?? null;
+
+        if ($actividad_id) {
+            // 1. Obtener nombre
+            $stmt = $pdo->prepare("SELECT imagen_url FROM actividades WHERE id = ?");
+            $stmt->execute([$actividad_id]);
+            $act = $stmt->fetch();
+
+            if ($act && $act['imagen_url']) {
+                $rutaArchivo = 'uploads/' . $act['imagen_url'];
+                if (file_exists($rutaArchivo)) {
+                    unlink($rutaArchivo);
+                }
+                // 2. Actualizar BD a NULL
+                $stmt = $pdo->prepare("UPDATE actividades SET imagen_url = NULL WHERE id = ?");
+                $stmt->execute([$actividad_id]);
+                echo json_encode(["message" => "Portada eliminada"]);
+            }
+        }
+    }
+
+    // ==========================================
+    // 8. GESTIÓN DE USUARIO (PERFIL)
+    // ==========================================
+    elseif ($route === 'usuario') {
+        
+        // A. OBTENER DATOS (GET) - Para recargar el perfil
+        if ($method === 'GET' && $id) {
+            $stmt = $pdo->prepare("SELECT id, nombre, email, imagen_url FROM usuarios WHERE id = ?");
+            $stmt->execute([$id]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            echo json_encode($user ?: ["error" => "Usuario no encontrado"]);
+        }
+
+        // B. ACTUALIZAR PERFIL (POST)
+        elseif ($method === 'POST' && $id) {
+            
+            // 1. Obtener datos actuales para no perder la foto/pass si no se envían
+            $stmt = $pdo->prepare("SELECT password_hash, imagen_url FROM usuarios WHERE id = ?");
+            $stmt->execute([$id]);
+            $currentUser = $stmt->fetch();
+
+            if (!$currentUser) {
+                http_response_code(404);
+                echo json_encode(["error" => "Usuario no encontrado"]);
+                exit;
+            }
+
+            // 2. Recoger datos del formulario
+            $nombre = $_POST['nombre'] ?? '';
+            $email = $_POST['email'] ?? '';
+            $password = $_POST['password'] ?? ''; // Si viene vacío, no se cambia
+            
+            if (empty($nombre) || empty($email)) {
+                http_response_code(400);
+                echo json_encode(["error" => "Nombre y Email son obligatorios"]);
+                exit;
+            }
+
+            // 3. Manejo de la Imagen (Avatar)
+            $imagen_url = $currentUser['imagen_url']; // Por defecto, la que ya tenía
+            
+            if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+                // Borrar foto anterior si existe para no llenar el servidor
+                if ($imagen_url && file_exists('uploads/' . $imagen_url)) {
+                    unlink('uploads/' . $imagen_url);
+                }
+                // Guardar nueva
+                $imagen_url = guardarImagen($_FILES['imagen']);
+            }
+
+            // 4. Manejo de la Contraseña
+            $password_hash = $currentUser['password_hash']; // Por defecto, la que ya tenía
+            if (!empty($password)) {
+                $password_hash = password_hash($password, PASSWORD_DEFAULT);
+            }
+
+            // 5. Actualizar en BD
+            $sql = "UPDATE usuarios SET nombre = ?, email = ?, password_hash = ?, imagen_url = ? WHERE id = ?";
+            $stmt = $pdo->prepare($sql);
+            
+            try {
+                $stmt->execute([$nombre, $email, $password_hash, $imagen_url, $id]);
+                
+                // Devolver los datos nuevos para que el frontend se actualice al instante
+                echo json_encode([
+                    "message" => "Perfil actualizado correctamente",
+                    "user" => [
+                        "id" => $id,
+                        "nombre" => $nombre,
+                        "email" => $email,
+                        "imagen_url" => $imagen_url
+                    ]
+                ]);
+            } catch (PDOException $e) {
+                http_response_code(500);
+                echo json_encode(["error" => "Error al actualizar: " . $e->getMessage()]);
+            }
         }
     }
 ?>

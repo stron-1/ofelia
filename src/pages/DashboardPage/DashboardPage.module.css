@@ -1,44 +1,99 @@
-/* 1. Contenedor principal (Flexbox) */
+/* 1. Contenedor principal */
 .dashboardContainer {
   display: flex;
   min-height: 100vh;
-  /* Usamos un fondo gris claro para el área de contenido */
   background-color: #f4f7fa; 
 }
 
-/* 2. Sidebar (definido en DashboardPage.tsx) */
+/* 2. SIDEBAR */
 .sidebar {
-  /* Añade esto para que el botón de logout se vaya al fondo */
   display: flex;
   flex-direction: column;
   background-color: var(--color-primary); 
   color: var(--color-white);
   flex-shrink: 0;
   transition: width 0.3s ease-in-out;
-  overflow-x: hidden;
+  height: 100vh;      
+  position: sticky;   
+  top: 0;             
+  overflow: hidden;   
+  z-index: 100;     
 }
 
-/* Estado abierto */
-.sidebar.open {
-  width: 250px;
-}
-/* Estado colapsado */
-.sidebar.closed {
-  width: 80px;
-}
+.sidebar.open { width: 250px; }
+.sidebar.closed { width: 80px; }
 
-.logoArea {
+/* --- PERFIL --- */
+.profileSection {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 1.5rem 0;
-  /* Usamos la fuente de títulos de global.css */
-  font-family: var(--font-heading); 
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: 2px;
+  padding: 1.5rem 0.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 1rem;
 }
 
+.avatarWrapper {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 0.5rem;
+  transition: width 0.3s, height 0.3s;
+}
+
+.closed .avatarWrapper {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 0;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.8);
+  background: white;
+}
+
+.onlineIndicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 13px;
+  height: 13px;
+  background-color: #2ecc71;
+  border: 2px solid var(--color-primary);
+  border-radius: 50%;
+}
+
+.profileInfo {
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+  overflow: hidden;
+  width: 100%;
+}
+
+.profileName {
+  display: block;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-top: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profileRole {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* --- NAV MENU --- */
 .navMenu {
   display: flex;
   flex-direction: column;
@@ -51,13 +106,12 @@
   padding: 1rem 1.5rem;
   color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
-  font-family: var(--font-body); /* */
+  font-family: var(--font-body);
   font-weight: 700;
   transition: all 0.3s ease;
-  white-space: nowrap; /* Evita que el texto se parta */
+  white-space: nowrap;
 }
 
-/* Centra los íconos cuando está colapsado */
 .closed .navLink {
   justify-content: center;
   padding: 1rem;
@@ -68,82 +122,28 @@
   color: var(--color-white);
 }
 
-/* Estilo del link activo (usando el acento dorado) */
 .navLink.active {
   background-color: var(--color-accent); 
-  color: var(--color-primary); /* */
+  color: var(--color-primary);
 }
 
 .navLink .material-symbols-outlined {
   font-size: 1.8rem;
-  min-width: 24px; /* Asegura alineación */
+  min-width: 24px;
 }
 
-.linkText {
-  margin-left: 1rem;
-}
+.linkText { margin-left: 1rem; }
 
-/* 3. Área Principal (Header + Contenido) */
-.mainArea {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-/* 4. Header */
-.header {
-  display: flex;
-  align-items: center;
-  padding: 0 1.5rem;
-  height: 70px;
-  background-color: var(--color-white);
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.toggleBtn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--color-text); /* Color texto */
-  margin-right: 1rem;
-}
-.toggleBtn .material-symbols-outlined {
-  font-size: 2rem;
-  vertical-align: middle;
-}
-
-.headerTitle {
-  font-size: 1.5rem;
-  margin: 0;
-  color: var(--color-primary); /* */
-}
-
-/* 5. Contenido de la página (Bienvenida) */
-.pageContent {
-  padding: 2rem;
-  flex-grow: 1;
-}
-
-.pageContent h2 {
-  font-family: var(--font-heading); /* */
-  color: var(--color-primary); /* */
-}
-
-.pageContent p {
-  font-family: var(--font-body); /* */
-  color: var(--color-text); /* */
-  font-size: 1.1rem;
-}
-
-/* 6. ESTILOS PARA EL BOTÓN DE LOGOUT (Añadir al final) */
+/* --- LOGOUT SECTION --- */
 .logoutSection {
-  margin-top: auto; /* ¡Esta es la magia! Empuja el botón al fondo */
+  margin-top: auto; 
   padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.2); /* Un separador sutil */
+  padding-bottom: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: var(--color-primary);
 }
 
 .logoutButton {
-  /* Reutiliza estilos de navLink pero como botón */
   display: flex;
   align-items: center;
   width: 100%;
@@ -151,29 +151,224 @@
   background: none;
   border: none;
   cursor: pointer;
-  
-  /* Estilos de texto (igual a navLink) */
   color: rgba(255, 255, 255, 0.8);
   font-family: var(--font-body);
   font-weight: 700;
-  font-size: 1rem; /* Aseguramos tamaño de fuente */
+  font-size: 1rem;
   transition: all 0.3s ease;
   white-space: nowrap;
 }
 
-/* Centra el ícono cuando está colapsado */
 .closed .logoutButton {
   justify-content: center;
   padding: 1rem;
 }
 
-/* Color de "peligro" al hacer hover */
 .logoutButton:hover {
-  background-color: #c9302c; /* Un rojo oscuro */
+  background-color: #c9302c;
   color: var(--color-white);
 }
 
 .logoutButton .material-symbols-outlined {
   font-size: 1.8rem;
   min-width: 24px;
+}
+
+/* 3. Área Principal */
+.mainArea {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 4. HEADER LIMPIO */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  height: 70px;
+  background-color: var(--color-white);
+  border-bottom: 1px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+}
+
+/* Lado Izquierdo */
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.toggleBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+.toggleBtn:hover { background-color: #f0f0f0; }
+.toggleBtn .material-symbols-outlined { font-size: 1.8rem; }
+
+.headerBreadcrumb {
+  font-size: 1.25rem;
+  margin: 0;
+  color: var(--color-primary);
+  font-family: var(--font-heading);
+  white-space: nowrap;
+}
+
+/* Lado Derecho */
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  position: relative; /* Importante para el dropdown */
+}
+
+.headerIconBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #555;
+  font-size: 1.2rem;
+  padding: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  position: relative;
+  text-decoration: none;
+}
+
+.headerIconBtn:hover, .activeBtn {
+  background-color: #eef2ff;
+  color: var(--color-primary);
+}
+
+.notificationDot {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 8px;
+  height: 8px;
+  background-color: #e74c3c;
+  border-radius: 50%;
+  border: 1px solid white;
+}
+
+/* --- ESTILOS DEL DROPDOWN DE NOTIFICACIONES --- */
+.notificationDropdown {
+  position: absolute;
+  top: 120%; /* Justo debajo del botón */
+  right: 0;
+  width: 320px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  border: 1px solid #eee;
+  z-index: 1000;
+  overflow: hidden;
+  animation: slideUp 0.2s ease-out;
+}
+
+.notifHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+
+.notifHeader h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.notifHeader span {
+  font-size: 0.75rem;
+  color: var(--color-primary);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.notifList {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.notifItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 1rem;
+  border-bottom: 1px solid #f9f9f9;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.notifItem:hover {
+  background-color: #f8faff;
+}
+
+.notifItem:last-child { border-bottom: none; }
+
+.notifIconBox {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.notifIconBox.blue { background: #e3f2fd; color: #1e88e5; }
+.notifIconBox.orange { background: #fff3e0; color: #fb8c00; }
+.notifIconBox.green { background: #e8f5e9; color: #43a047; }
+
+.notifContent {
+  flex: 1;
+}
+
+.notifText {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.3;
+  color: #444;
+}
+
+.notifTime {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: #999;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 5. Contenido */
+.pageContent {
+  padding: 2rem;
+  flex-grow: 1;
 }

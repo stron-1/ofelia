@@ -14,8 +14,10 @@ import { AcademicoIndex } from './pages/AcademicoPage/AcademicoIndex';
 
 // --- IMPORTACIONES DE ADMIN ---
 import GestionActividadesPage from './pages/Admin/GestionActividadesPage';
-// Importamos la nueva página de Gestión de Contacto
 import GestionContactoPage from './pages/Admin/GestionContactoPage';
+
+// 1. IMPORTAR LA NUEVA PÁGINA DE CONFIGURACIÓN
+import ConfiguracionPage from './pages/Admin/ConfiguracionPage';
 
 // Solo importamos Secundaria
 import { SecundariaInfo } from './pages/AcademicoPage/Secundaria/Info/SecundariaInfo';
@@ -28,7 +30,6 @@ import { ProtectedRoute } from './components/common/ProtectedRoute/ProtectedRout
 import { DashboardPage } from './pages/DashboardPage/DashboardPage';
 import { DashboardIndex } from './pages/Admin/DashboardIndex';
 
-// Solo importamos gestiones de Secundaria y Personal
 import { GestionSecundariaPage } from './pages/Admin/GestionSecundariaPage';
 import { GestionDirectivosPage } from './pages/Admin/GestionDirectivosPage';
 import { GestionAdministrativosPage } from './pages/Admin/GestionAdministrativosPage';
@@ -65,12 +66,14 @@ const router = createBrowserRouter([
     ),
     children: [
       { path: "dashboard", element: <DashboardIndex /> },
-      // Eliminada ruta de gestión primaria
       { path: "secundaria", element: <GestionSecundariaPage /> },
       { path: "directivos", element: <GestionDirectivosPage /> },
       { path: "administrativos", element: <GestionAdministrativosPage /> },
       { path: "actividades", element: <GestionActividadesPage /> },
       { path: "mensajes", element: <GestionContactoPage /> },
+      
+      // 2. AGREGAR LA RUTA AQUÍ
+      { path: "configuracion", element: <ConfiguracionPage /> },
     ]
   }
 ]);
