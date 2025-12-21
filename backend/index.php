@@ -167,50 +167,64 @@ if ($tabla) {
 if ($route === 'actividades') {
     // 1. LISTAR (GET) - Con JOIN para traer la galería
     if ($method === 'GET') {
+        // Aumentamos el límite para que no corte galerías con muchas fotos
         $pdo->exec("SET SESSION group_concat_max_len = 1000000");
-        $categoria = $_GET['categoria'] ?? null;
         
-        // Hacemos LEFT JOIN para traer las fotos de la galería concatenadas
-        $sql = "SELECT a.*, GROUP_CONCAT(g.imagen_url) as galeria_urls 
+        $categoria = $_GET['categoria'] ?? null;
+        $params = [];
+        
+        $sql = "SELECT 
+                    a.*, 
+                    GROUP_CONCAT(g.imagen_url) as galeria_urls,
+                    (SELECT COUNT(*) FROM comentarios c WHERE c.actividad_id = a.id AND c.estado = 'aprobado') as total_comentarios
                 FROM actividades a 
                 LEFT JOIN actividades_galeria g ON a.id = g.actividad_id ";
         
-        if ($categoria) {
+        // Filtro por categoría (Si es 'Todas' o null, no filtramos)
+        if ($categoria && $categoria !== 'Todas') {
             $sql .= " WHERE a.categoria = ? ";
+            $params[] = $categoria;
         }
         
+        // Agrupamos por ID para que GROUP_CONCAT funcione y ordenamos por el más reciente
         $sql .= " GROUP BY a.id ORDER BY a.id DESC";
 
         $stmt = $pdo->prepare($sql);
-        $stmt->execute($categoria ? [$categoria] : []);
+        $stmt->execute($params);
         $resultados = $stmt->fetchAll();
 
-        // Procesamos los resultados para convertir el string "foto1.jpg,foto2.jpg" en un Array real
+        // PROCESAMIENTO DE DATOS (Formateo para el Frontend)
         foreach ($resultados as &$fila) {
+            // Convertimos "foto1.jpg,foto2.jpg" en un Array real ['foto1.jpg', 'foto2.jpg']
             if (!empty($fila['galeria_urls'])) {
                 $fila['galeria'] = explode(',', $fila['galeria_urls']);
             } else {
                 $fila['galeria'] = [];
             }
             
-            // Truco: Agregamos la portada a la galería si no está repetida, para que el carrusel tenga al menos 1 foto
+            // Lógica visual: Si hay portada, la ponemos al inicio de la galería 
+            // (si no está ya repetida) para que el carrusel se vea lleno.
             if (!empty($fila['imagen_url']) && !in_array($fila['imagen_url'], $fila['galeria'])) {
                 array_unshift($fila['galeria'], $fila['imagen_url']);
             }
+
+            // Limpiamos el campo sucio que usamos para la lógica
+            unset($fila['galeria_urls']);
         }
+        
         echo json_encode($resultados);
     }
     
-    // 2. CREAR (POST sin ID)
+// 2. CREAR (POST sin ID)
     elseif ($method === 'POST' && !$id) {
+        // Guardar portada principal
         $imgPortada = guardarImagen($_FILES['imagen'] ?? null);
         
         try {
-            // Iniciamos transacción: O se guardan todas las fotos o ninguna
             $pdo->beginTransaction();
 
-            // A. Insertamos la Actividad Principal
-            $sql = "INSERT INTO actividades (titulo, descripcion, categoria, imagen_url) VALUES (?, ?, ?, ?)";
+            // A. Insertar Actividad
+            $sql = "INSERT INTO actividades (titulo, descripcion, categoria, imagen_url, fecha_creacion) VALUES (?, ?, ?, ?, NOW())";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
                 $_POST['titulo'], 
@@ -219,19 +233,20 @@ if ($route === 'actividades') {
                 $imgPortada
             ]);
             
-            // Obtenemos el ID de la actividad recién creada
             $actividadId = $pdo->lastInsertId();
 
-            // B. Procesamos la Galería (Múltiples Archivos)
-            if (isset($_FILES['galeria'])) {
-                $totalFiles = count($_FILES['galeria']['name']);
+            // B. Procesar Galería (Bucle blindado)
+            if (isset($_FILES['galeria']) && is_array($_FILES['galeria']['name'])) {
                 $sqlGaleria = "INSERT INTO actividades_galeria (actividad_id, imagen_url) VALUES (?, ?)";
                 $stmtGaleria = $pdo->prepare($sqlGaleria);
+                
+                $totalFiles = count($_FILES['galeria']['name']);
 
                 for ($i = 0; $i < $totalFiles; $i++) {
-                    // Verificamos errores individuales
+                    // Verificamos que no haya error en la subida individual
                     if ($_FILES['galeria']['error'][$i] === UPLOAD_ERR_OK) {
-                        // Reconstruimos el array de archivo individual para usar la funcion guardarImagen
+                        
+                        // Reconstruimos el array de archivo para la función guardarImagen
                         $archivoUnico = [
                             'name'     => $_FILES['galeria']['name'][$i],
                             'type'     => $_FILES['galeria']['type'][$i],
@@ -239,8 +254,10 @@ if ($route === 'actividades') {
                             'error'    => $_FILES['galeria']['error'][$i],
                             'size'     => $_FILES['galeria']['size'][$i]
                         ];
-                        
+
                         $nombreGuardado = guardarImagen($archivoUnico);
+                        
+                        // Solo insertamos si se guardó la imagen física
                         if ($nombreGuardado) {
                             $stmtGaleria->execute([$actividadId, $nombreGuardado]);
                         }
@@ -248,28 +265,28 @@ if ($route === 'actividades') {
                 }
             }
 
-            $pdo->commit(); // Confirmamos cambios
+            $pdo->commit(); 
             echo json_encode(["message" => "Actividad creada con éxito", "id" => $actividadId]);
 
         } catch (Exception $e) {
-            $pdo->rollBack(); // Si falla algo, deshacemos todo
+            $pdo->rollBack();
             http_response_code(500);
-            echo json_encode(["error" => $e->getMessage()]);
+            echo json_encode(["error" => "Error al guardar: " . $e->getMessage()]);
         }
     }
 
     // 3. EDITAR (POST con ID)
     elseif ($method === 'POST' && $id) {
-        // Nota: Esta es una edición básica, actualiza textos y portada.
-        // Las fotos nuevas de galería se AGREGAN a las que ya existen.
         $img = guardarImagen($_FILES['imagen'] ?? null);
         
         try {
             $pdo->beginTransaction();
 
+            // Actualizar datos básicos
             $sql = "UPDATE actividades SET titulo=?, descripcion=?, categoria=?";
             $params = [$_POST['titulo'], $_POST['descripcion'] ?? '', $_POST['categoria']];
             
+            // Si hay nueva portada, la actualizamos
             if ($img) {
                 $sql .= ", imagen_url=?";
                 $params[] = $img;
@@ -281,21 +298,25 @@ if ($route === 'actividades') {
             $stmt = $pdo->prepare($sql);
             $stmt->execute($params);
 
-            // Insertar nuevas fotos a la galería si las enviaron
-            if (isset($_FILES['galeria'])) {
-                $totalFiles = count($_FILES['galeria']['name']);
+            // Insertar nuevas fotos a la galería (se suman a las existentes)
+            if (isset($_FILES['galeria']) && is_array($_FILES['galeria']['name'])) {
                 $sqlGaleria = "INSERT INTO actividades_galeria (actividad_id, imagen_url) VALUES (?, ?)";
                 $stmtGaleria = $pdo->prepare($sqlGaleria);
+                
+                $totalFiles = count($_FILES['galeria']['name']);
 
                 for ($i = 0; $i < $totalFiles; $i++) {
                     if ($_FILES['galeria']['error'][$i] === UPLOAD_ERR_OK) {
                         $archivoUnico = [
-                            'name' => $_FILES['galeria']['name'][$i],
+                            'name'     => $_FILES['galeria']['name'][$i],
+                            'type'     => $_FILES['galeria']['type'][$i],
                             'tmp_name' => $_FILES['galeria']['tmp_name'][$i],
-                            'error' => 0 // Asumimos OK si pasó el if
+                            'error'    => $_FILES['galeria']['error'][$i],
+                            'size'     => $_FILES['galeria']['size'][$i]
                         ];
-                        // Nota simple para reusar guardarImagen sin todos los campos opcionales
+
                         $nombreGuardado = guardarImagen($archivoUnico);
+                        
                         if ($nombreGuardado) {
                             $stmtGaleria->execute([$id, $nombreGuardado]);
                         }
@@ -304,11 +325,11 @@ if ($route === 'actividades') {
             }
 
             $pdo->commit();
-            echo json_encode(["message" => "Actividad actualizada"]);
+            echo json_encode(["message" => "Actividad actualizada correctamente"]);
         } catch (Exception $e) {
             $pdo->rollBack();
             http_response_code(500);
-            echo json_encode(["error" => $e->getMessage()]);
+            echo json_encode(["error" => "Error al actualizar: " . $e->getMessage()]);
         }
     }
 
@@ -499,6 +520,86 @@ if ($route === 'actividades') {
                 http_response_code(500);
                 echo json_encode(["error" => "Error al actualizar: " . $e->getMessage()]);
             }
+        }
+    }
+
+// --- RUTA: INTERACCIONES SOCIALES (LIKES Y COMENTARIOS) ---
+    elseif ($route === 'social') {
+        
+        // 1. LEER DATOS JSON (IMPORTANTE: Esto faltaba)
+        $json = json_decode(file_get_contents('php://input'), true);
+
+        // A. DAR LIKE (Público)
+        if ($method === 'POST' && isset($_GET['accion']) && $_GET['accion'] === 'like') {
+            // Buscamos el ID en el JSON ($json), en POST normal o en la URL
+            $actividad_id = $json['id'] ?? $_POST['id'] ?? $_GET['id'] ?? null;
+            
+            if ($actividad_id) {
+                // Actualizamos
+                $stmt = $pdo->prepare("UPDATE actividades SET likes = likes + 1 WHERE id = ?");
+                $stmt->execute([$actividad_id]);
+                
+                // Devolvemos el dato actualizado para que el frontend no mienta
+                $stmt = $pdo->prepare("SELECT likes FROM actividades WHERE id = ?");
+                $stmt->execute([$actividad_id]);
+                $nuevo_total = $stmt->fetch()['likes'];
+                
+                echo json_encode(["message" => "Like agregado", "likes" => $nuevo_total]);
+            } else {
+                http_response_code(400);
+                echo json_encode(["error" => "No se recibió el ID de la actividad"]);
+            }
+        }
+
+        // B. PUBLICAR COMENTARIO (Público - Estado Pendiente)
+        elseif ($method === 'POST' && isset($_GET['accion']) && $_GET['accion'] === 'comentar') {
+            // Leemos del JSON primero (Frontend suele enviar JSON) o de POST
+            $actividad_id = $json['actividad_id'] ?? $_POST['actividad_id'] ?? null;
+            $autor        = $json['autor'] ?? $_POST['autor'] ?? 'Anónimo';
+            $contenido    = $json['contenido'] ?? $_POST['contenido'] ?? '';
+
+            if ($actividad_id && !empty($contenido)) {
+                $stmt = $pdo->prepare("INSERT INTO comentarios (actividad_id, autor, contenido, estado, fecha) VALUES (?, ?, ?, 'pendiente', NOW())");
+                $stmt->execute([$actividad_id, $autor, $contenido]);
+                echo json_encode(["message" => "Comentario enviado a moderación"]);
+            } else {
+                http_response_code(400);
+                echo json_encode(["error" => "Faltan datos (ID o Contenido)"]);
+            }
+        }
+
+        // C. OBTENER COMENTARIOS APROBADOS (Público)
+        elseif ($method === 'GET' && isset($_GET['actividad_id'])) {
+            $act_id = $_GET['actividad_id'];
+            $sql = "SELECT id, autor, contenido, fecha FROM comentarios WHERE actividad_id = ? AND estado = 'aprobado' ORDER BY fecha DESC";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$act_id]);
+            echo json_encode($stmt->fetchAll());
+        }
+
+        // D. GESTIÓN ADMIN: Ver Pendientes
+        elseif ($method === 'GET' && isset($_GET['admin_pendientes'])) {
+            $sql = "SELECT c.*, a.titulo as actividad_titulo FROM comentarios c JOIN actividades a ON c.actividad_id = a.id WHERE c.estado = 'pendiente' ORDER BY c.fecha DESC";
+            $stmt = $pdo->query($sql);
+            echo json_encode($stmt->fetchAll());
+        }
+        
+        // E. GESTIÓN ADMIN: Aprobar
+        elseif (($method === 'PUT' || $method === 'POST') && isset($_GET['accion']) && $_GET['accion'] === 'aprobar') {
+            if ($id) {
+                $stmt = $pdo->prepare("UPDATE comentarios SET estado = 'aprobado' WHERE id = ?");
+                $stmt->execute([$id]);
+                echo json_encode(["message" => "Comentario aprobado"]);
+            } else {
+                http_response_code(400); echo json_encode(["error" => "Falta ID"]);
+            }
+        }
+        
+        // F. GESTIÓN ADMIN: Rechazar/Borrar
+        elseif ($method === 'DELETE' && $id) {
+            $stmt = $pdo->prepare("DELETE FROM comentarios WHERE id = ?");
+            $stmt->execute([$id]);
+            echo json_encode(["message" => "Comentario eliminado"]);
         }
     }
 ?>

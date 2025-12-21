@@ -1,211 +1,136 @@
-/* --- LAYOUT PRINCIPAL --- */
-.pageContainer {
-  max-width: 1100px; 
-  margin: 0 auto;
-  padding: 2rem; /* Espacio equilibrado */
-  animation: fadeIn 0.5s ease-out;
-}
-
-/* Header Alineado a la Izquierda (Estilo Global) */
-.pageHeader {
-  margin-bottom: 2rem;
-  text-align: left;
-}
-
-.headerTitle {
-  font-size: 2rem;
-  color: var(--color-primary);
-  margin-top: 0;
-  margin-bottom: 1.5rem;
-  display: block;
-  border-bottom: 3px solid var(--color-accent);
-  padding-bottom: 0.5rem;
-  width: 100%;
-}
-
-/* --- GRID DE CONTENIDO --- */
-.contentGrid {
+/* --- LAYOUT (Grid de 2 columnas) --- */
+.layoutGrid {
   display: grid;
-  grid-template-columns: 1fr 350px;
-  gap: 3rem;
+  grid-template-columns: 1fr 300px; /* Feed ancho | Sidebar de 300px */
+  gap: 2.5rem;
   align-items: start;
+  margin-top: 2rem; /* Separación con el título global */
 }
 
-@media (max-width: 960px) {
-  .contentGrid {
-    grid-template-columns: 1fr;
-  }
-  .sidebarColumn {
-    display: none;
-  }
-}
+.feedColumn { width: 100%; }
 
-/* --- COLUMNA FEED --- */
-.feedColumn {
-  width: 100%;
-  max-width: 650px;
-  margin: 0 auto;
-}
-
-/* --- SIDEBAR --- */
 .sidebarColumn {
   position: sticky;
   top: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
-.widgetCard {
+/* --- FILTROS SIDEBAR --- */
+.filterCard {
   background: white;
-  border: 1px solid #eee;
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  border: 1px solid #eee;
 }
 
-.widgetTitle {
-  font-family: var(--font-heading);
-  color: var(--color-primary);
+.sidebarTitle {
+  margin: 0 0 1rem 0;
   font-size: 1.1rem;
-  margin-top: 0;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #f0f0f0;
-}
-
-/* Categorías */
-.categoriesList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.categoryTag {
-  background: #f4f6f8;
-  color: #555;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: 1px solid transparent;
-}
-
-.categoryTag:hover {
-  background: #e0e0e0;
-}
-
-.categoryTag.active {
-  background: var(--color-primary);
-  color: white;
-  box-shadow: 0 2px 5px rgba(1, 75, 160, 0.3);
-}
-
-/* Mini Eventos */
-.miniEvent {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 1rem;
-  align-items: center;
-}
-.dateBox {
-  background: var(--color-accent);
   color: var(--color-primary);
-  padding: 5px 10px;
-  border-radius: 6px;
-  text-align: center;
-  font-weight: 700;
-  min-width: 50px;
-}
-.dateDay { font-size: 1.1rem; display: block; line-height: 1; }
-.dateMonth { font-size: 0.7rem; text-transform: uppercase; }
-
-.eventInfo h4 { margin: 0; font-size: 0.95rem; color: #333; }
-.eventInfo span { font-size: 0.8rem; color: #777; }
-
-/* --- POST SOCIAL --- */
-.socialCard {
-  background: var(--color-white);
-  border: 1px solid #dbdbdb;
-  border-radius: 8px;
-  margin-bottom: 2rem;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-  display: flex;
-  flex-direction: column;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 0.5rem;
 }
 
-.postHeader { padding: 14px; display: flex; align-items: center; justify-content: space-between; }
-.userInfo { display: flex; align-items: center; gap: 10px; }
-.userAvatar { width: 40px; height: 40px; border-radius: 50%; background: #eee; object-fit: cover; border: 1px solid #eee; }
-.userName { font-family: var(--font-heading); font-weight: 700; font-size: 0.95rem; color: var(--color-primary); display: flex; flex-direction: column; }
-.postLocation { font-family: var(--font-body); font-size: 0.75rem; font-weight: 400; color: #666; }
-.moreOptionsBtn { background: none; border: none; cursor: pointer; font-size: 1.2rem; color: #333; }
-
-/* --- ZONA DE IMAGEN (CORREGIDA PARA ALTURA COMPLETA) --- */
-.postMedia {
-  width: 100%;
-  background-color: #000; 
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 500px; /* Altura fija estándar */
-  overflow: hidden;
-  z-index: 1;
+.categoryList {
+  list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;
 }
+
+.categoryBtn {
+  width: 100%; text-align: left; background: none; border: none; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 0.95rem; color: #555; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center;
+}
+
+.categoryBtn:hover { background-color: #f8f9fa; color: var(--color-primary); }
+
+.categoryBtn.active {
+  background-color: var(--color-primary); color: white; font-weight: 700; box-shadow: 0 4px 10px rgba(1, 75, 160, 0.2);
+}
+
+.countBadge {
+  background: #eee; color: #666; font-size: 0.75rem; padding: 2px 8px; border-radius: 12px;
+}
+.categoryBtn.active .countBadge { background: rgba(255,255,255,0.2); color: white; }
+
+/* --- TARJETA DE FEED --- */
+.feedCard {
+  background: white; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.08); border: 1px solid #e5e5e5; overflow: hidden;
+}
+
+.cardHeader { padding: 1rem; display: flex; align-items: center; gap: 12px; }
+.avatarSmall { width: 42px; height: 42px; border-radius: 50%; border: 2px solid #eee; object-fit: cover; }
+.headerInfo h4 { margin: 0; font-size: 0.95rem; color: var(--color-primary); font-weight: 700; }
+.headerInfo span { font-size: 0.75rem; color: #888; }
+
+.cardContent { padding: 0 1rem 0.8rem 1rem; }
+.cardTitle { margin: 0 0 0.5rem 0; font-size: 1.15rem; color: #222; }
+.cardDesc { margin: 0; font-size: 0.95rem; color: #444; line-height: 1.5; }
+
+/* --- GRID DE IMAGENES --- */
+.mediaGridContainer {
+  width: 100%; display: grid; gap: 2px; cursor: pointer; background: #fff;
+  border-top: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0; height: 400px; overflow: hidden;
+}
+.imageWrapper { position: relative; width: 100%; height: 100%; overflow: hidden; }
+.gridImage { width: 100%; height: 100%; object-fit: cover; transition: transform 0.2s, filter 0.2s; display: block; }
+.mediaGridContainer:hover .gridImage { filter: brightness(0.95); }
+
+.grid1 { grid-template-columns: 1fr; }
+.grid2 { grid-template-columns: 1fr 1fr; }
+.grid3 { grid-template-columns: 1.5fr 1fr; grid-template-rows: 1fr 1fr; }
+.grid3 .imageWrapper:first-child { grid-row: span 2; }
+.grid4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+.moreOverlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; }
+
+/* --- ACCIONES --- */
+.actionRow { padding: 0.8rem 1rem; display: flex; gap: 20px; }
+.actionBtn { background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; color: #555; font-size: 0.9rem; font-weight: 600; padding: 6px 10px; border-radius: 4px; transition: background 0.1s; }
+.actionBtn:hover { background: #f5f5f5; }
+
+/* --- MODAL OPTIMIZADO --- */
+.modalOverlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.95); 
+  display: flex; align-items: center; justify-content: center; padding: 2rem; animation: fadeIn 0.2s ease-out;
+}
+.modalCloseBtn { position: absolute; top: 20px; right: 20px; color: white; font-size: 2.5rem; background: none; border: none; cursor: pointer; z-index: 10001; }
+
+.modalContent {
+  background: white; width: 100%; max-width: 1200px; height: 85vh; display: flex; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+/* LADO IZQUIERDO: FONDO BORROSO INTEGRADO */
+.modalLeft { flex: 2; background: #111; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
 
 .blurBackground {
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background-position: center;
-  background-size: cover;
-  filter: blur(30px) brightness(0.5); /* Más blur para que no compita */
-  transform: scale(1.2);
-  z-index: 0;
+  position: absolute; inset: -20px; background-size: cover; background-position: center; filter: blur(25px) brightness(0.5); z-index: 1;
 }
 
-.mediaImage {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  height: 100%;
-  /* CAMBIO CLAVE: object-fit: cover asegura que NO haya bordes arriba/abajo en fotos horizontales */
-  /* Si la foto es vertical, se verá bien. Si es horizontal, cortará los lados para llenar la altura. */
-  object-fit: contain; 
-  /* Nota: Si quieres que LLENE siempre, usa 'cover'. Si quieres que se vea ENTERA, usa 'contain'.
-     Tu pediste que alcance la altura completa. Con 'contain' y foto horizontal, queda espacio arriba/abajo.
-     Voy a poner un truco: max-height: 100%; width: auto; */
-  display: block;
-  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+.fullImage { position: relative; z-index: 2; max-width: 100%; max-height: 100%; object-fit: contain; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+
+.navBtn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; transition: all 0.2s; z-index: 10; backdrop-filter: blur(4px); }
+.navBtn:hover { background: rgba(255,255,255,0.4); scale: 1.1; }
+.prev { left: 15px; } .next { right: 15px; }
+
+/* LADO DERECHO */
+.modalRight { flex: 1; min-width: 350px; background: white; display: flex; flex-direction: column; position: relative; z-index: 5; }
+.modalHeader { padding: 1.5rem; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px; }
+.userName { display: flex; flex-direction: column; }
+.commentsScroll { flex: 1; overflow-y: auto; padding: 1.5rem; }
+.commentItem { margin-bottom: 10px; font-size: 0.9rem; }
+.modalFooter { padding: 1.5rem; border-top: 1px solid #eee; background: #f9f9f9; }
+.inputGroup { display: flex; gap: 5px; margin-top: 10px; }
+.inputClean { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+.btnPost { border: none; background: none; color: var(--color-primary); font-weight: bold; cursor: pointer; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .layoutGrid { grid-template-columns: 1fr; }
+  .sidebarColumn { display: none; }
+  .mediaGridContainer { height: 350px; }
+  .modalContent { flex-direction: column; border-radius: 0; }
+  .modalLeft { height: 50%; } .modalRight { height: 50%; }
 }
-
-/* Controles */
-.navBtn {
-  position: absolute; top: 50%; transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(5px);
-  border: 1px solid rgba(255,255,255,0.6); width: 36px; height: 36px;
-  border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: white; opacity: 0; transition: all 0.2s; z-index: 2;
-}
-.postMedia:hover .navBtn { opacity: 1; background: rgba(0, 0, 0, 0.6); }
-.prevBtn { left: 15px; } .nextBtn { right: 15px; }
-.imageCounter { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.6); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; z-index: 2; backdrop-filter: blur(4px); }
-
-.postActions { padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; }
-.actionLeft { display: flex; gap: 16px; }
-.iconBtn { background: none; border: none; cursor: pointer; font-size: 1.5rem; color: #333; padding: 0; display: flex; }
-.iconBtn.liked { color: #ed4956; animation: heartBeat 0.3s ease-in-out; }
-.postInfo { padding: 0 14px 14px 14px; }
-.likesCount { font-weight: 700; font-size: 0.9rem; margin-bottom: 8px; display: block; color: var(--color-text); }
-.caption { font-size: 0.95rem; line-height: 1.4; margin-bottom: 6px; }
-.userNameCaption { font-weight: 700; margin-right: 6px; color: #262626; }
-.date { font-size: 0.75rem; color: #8e8e8e; text-transform: uppercase; margin-top: 4px; display: block; margin-bottom: 10px; }
-.commentSection { border-top: 1px solid #efefef; padding: 10px 14px; display: flex; align-items: center; }
-.commentInput { flex-grow: 1; border: none; outline: none; padding: 5px 0; font-family: var(--font-body); font-size: 0.9rem; background: transparent; resize: none; height: 20px; }
-.postBtn { background: none; border: none; color: var(--color-primary); font-weight: 700; font-size: 0.9rem; cursor: pointer; opacity: 0.5; }
-.postBtn:not(:disabled) { opacity: 1; }
-
-@keyframes heartBeat { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }

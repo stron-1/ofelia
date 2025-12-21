@@ -1,5 +1,5 @@
 const BASE_URL = '/api/index.php'; 
-export const IMAGE_BASE_URL = '/'; // Las imágenes también pasarán por el proxy
+export const IMAGE_BASE_URL = '/'; 
 
 async function client<T>(
   endpoint: string, 
@@ -9,8 +9,7 @@ async function client<T>(
 ): Promise<T> {
   
   const headers: HeadersInit = {};
-  
-  // Si no es multipart (archivos), indicamos que es JSON
+
   if (!isMultipart) {
     headers['Content-Type'] = 'application/json';
   }
@@ -21,16 +20,16 @@ async function client<T>(
     config.body = isMultipart ? (body as FormData) : JSON.stringify(body);
   }
 
-  // Construimos la URL. Ejemplo resultante: /api/index.php?route=login
   const response = await fetch(`${BASE_URL}?route=${endpoint}`, config);
   
   if (!response.ok) {
-      // Intentamos leer el error del backend, si falla devolvemos objeto vacío
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.error || 'Error en la petición');
   }
 
-  return response.json();
+  const text = await response.text();
+  
+  return text ? JSON.parse(text) : ({} as T);
 }
 
 export const apiClient = {
