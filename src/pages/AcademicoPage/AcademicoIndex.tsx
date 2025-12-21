@@ -64,7 +64,7 @@ export function AcademicoIndex() {
               size={1.5}
               items={[paperSecundariaInfo, paperSecundariaGaleria]}
             />
-            <h3 className={styles.folderTitle}>Nuestros Docentes</h3>
+            <h3 className={styles.folderTitle}>Nuestros Niveles</h3>
           </div>
 
           {/* CARPETA PERSONAL */}

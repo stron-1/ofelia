@@ -62,11 +62,11 @@ export function SecundariaInfo() {
         <div className={styles.scheduleGrid}>
           <div className={styles.scheduleCard}>
             <h3>Turno Mañana</h3>
-            <p className={styles.scheduleTime}>7:15 AM - 12:50 PM</p>
+            <p className={styles.scheduleTime}>6:45 AM - 12:30 PM</p>
           </div>
           <div className={styles.scheduleCard}>
             <h3>Turno Tarde</h3>
-            <p className={styles.scheduleTime}>12:50 PM - 6:10 PM</p>
+            <p className={styles.scheduleTime}>12:45 PM - 6:30 PM</p>
           </div>
         </div>
       </section>
