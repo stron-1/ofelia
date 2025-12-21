@@ -101,7 +101,7 @@ export function ActividadesPage() {
             <h3 className={styles.widgetTitle}>Próximos Eventos</h3>
             <div className={styles.miniEvent}>
               <div className={styles.dateBox}>
-                <span className={styles.dateDay}>15</span>
+                <span className={styles.dateDay}>31</span>
                 <span className={styles.dateMonth}>DIC</span>
               </div>
               <div className={styles.eventInfo}>
@@ -111,7 +111,7 @@ export function ActividadesPage() {
             </div>
             <div className={styles.miniEvent}>
               <div className={styles.dateBox}>
-                <span className={styles.dateDay}>22</span>
+                <span className={styles.dateDay}>30</span>
                 <span className={styles.dateMonth}>DIC</span>
               </div>
               <div className={styles.eventInfo}>

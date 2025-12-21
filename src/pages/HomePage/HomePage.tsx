@@ -71,7 +71,7 @@ export function HomePage() {
           <div className={styles.heroContent}>
             <h1>Forjando Líderes para el Futuro</h1>
             <p>
-              Más de 65 años de historia comprometidos con la excelencia
+              Más de 67 años de historia comprometidos con la excelencia
               académica y la formación de ciudadanos íntegros.
             </p>
             <NavLink to="/historia" className={styles.ctaButton}>

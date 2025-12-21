@@ -3,13 +3,11 @@ import styles from './HistoriaPage.module.css';
 import {
   FaUserGraduate,
   FaSchool,
-  FaMapMarkedAlt,
   FaCalendarAlt,
   FaBuilding,
   FaAward,
   FaFutbol,
   FaMedal,
-  FaFlag,
   FaRegHandPointUp,
   FaUsers, // Icono para reemplazar imagen
   FaFlask, // Icono para reemplazar imagen
@@ -18,7 +16,15 @@ import {
 import CardSwap, { Card } from '../../components/ui/CardSwap/CardSwap';
 
 import rosaOfeliaImg from '../../assets/images/Historia/rosa-ofelia.jpg';
-import fachadaActualImg from '../../assets/images/Historia/fachada-actual.jpg';
+import fachadaActualImg from '../../assets/images/Historia/mas67años.jpg';
+import creacionReubicacion from  '../../assets/images/Historia/reubicacion1.jpg';
+import primerlocal from '../../assets/images/Historia/primerlocal.jpg';
+import traslado from '../../assets/images/Historia/traslado.jpg';
+import localpropop from '../../assets/images/Historia/chontamuyo.jpg';
+import logros from '../../assets/images/Historia/logros.jpg';
+import lema from '../../assets/images/Historia/lema.jpg';
+import promociones from '../../assets/images/Historia/promociones.jpg';
+import localchonta from '../../assets/images/Historia/local-chontamuyo.jpg';
 // --- HOOK PARA DETECTAR SCROLL (NECESARIO) ---
 function useOnScreen(ref: React.RefObject<HTMLElement | null>) {
   const [isIntersecting, setIntersecting] = useState(false);
@@ -112,10 +118,9 @@ export function HistoriaPage() {
               cardDistance={25}
               verticalDistance={25}
             >
-              <Card customClass={`${styles.historyCard} ${styles.iconCard}`}>
-                <FaFlag size={50} />
-                <p>Pdte. Manuel Prado</p>
-                <p>Min. Jorge Basadre</p>
+              <Card customClass={styles.historyCard}>
+                {/* --- REUBICACION (USO): USANDO LA IMAGEN IMPORTADA --- */}
+                <img src={creacionReubicacion} alt="Reubicacion local" />
               </Card>
               <Card customClass={`${styles.historyCard} ${styles.iconCard}`}>
                 <h3>R.M. Nº 029</h3>
@@ -164,9 +169,9 @@ export function HistoriaPage() {
               cardDistance={25}
               verticalDistance={25}
             >
-              <Card customClass={`${styles.historyCard} ${styles.iconCard}`}>
-                <FaMapMarkedAlt size={50} />
-                <p>Jr. Leoncio Prado 5ta Cuadra</p>
+              <Card customClass={styles.historyCard}>
+                {/* --- ARREGLO 1 (USO): USANDO LA IMAGEN IMPORTADA --- */}
+                <img src={primerlocal} alt="Primer local de la IE" />
               </Card>
               <Card customClass={`${styles.historyCard} ${styles.iconCard}`}>
                 <h2>130</h2>
@@ -188,10 +193,9 @@ export function HistoriaPage() {
               cardDistance={25}
               verticalDistance={25}
             >
-              <Card customClass={`${styles.historyCard} ${styles.iconCard}`}>
-                <FaCalendarAlt size={50} />
-                <h3>15 de Setiembre</h3>
-                <p>Aniversario (Virgen de los Dolores)</p>
+              <Card customClass={styles.historyCard}>
+                {/* --- ARREGLO 1 (USO): USANDO LA IMAGEN IMPORTADA --- */}
+                <img src={traslado} alt="traslado" />
               </Card>
               <Card customClass={`${styles.historyCard} ${styles.iconCard}`}>
                 <FaBuilding size={50} />
@@ -237,14 +241,14 @@ export function HistoriaPage() {
               cardDistance={25}
               verticalDistance={25}
             >
-              <Card customClass={`${styles.historyCard} ${styles.iconCard}`}>
-                <FaBuilding size={50} />
-                <p>Gestión de la Madre Guadalupe</p>
+              <Card customClass={styles.historyCard}>
+                {/* --- ARREGLO 1 (USO): USANDO LA IMAGEN IMPORTADA --- */}
+                <img src={localpropop} alt="Local Propio" />
               </Card>
               {/* --- ARREGLO 2: IMAGEN REEMPLAZADA POR ICONO --- */}
-              <Card customClass={`${styles.historyCard} ${styles.iconCard}`}>
-                <FaSchool size={50} />
-                <p>Ocupación del Local Propio (1964)</p>
+              <Card customClass={styles.historyCard}>
+                {/* --- ARREGLO 1 (USO): USANDO LA IMAGEN IMPORTADA --- */}
+                <img src={localchonta} alt="Local de Chontamuyo" />
               </Card>
             </CardSwap>
           </div>
@@ -262,14 +266,13 @@ export function HistoriaPage() {
               cardDistance={25}
               verticalDistance={25}
             >
-              <Card customClass={`${styles.historyCard} ${styles.iconCard}`}>
-                <blockquote className={styles.historyQuote}>
-                  "Disciplina, Mérito, Trabajo"
-                </blockquote>
+              <Card customClass={styles.historyCard}>
+                {/* --- ARREGLO 1 (USO): USANDO LA IMAGEN IMPORTADA --- */}
+                <img src={lema} alt="Lema" />
               </Card>
-              <Card customClass={`${styles.historyCard} ${styles.iconCard}`}>
-                <FaUsers size={50} />
-                <p>58 Promociones Egresadas</p>
+              <Card customClass={styles.historyCard}>
+                {/* --- ARREGLO 1 (USO): USANDO LA IMAGEN IMPORTADA --- */}
+                <img src={promociones} alt="58 Promociones" />
               </Card>
             </CardSwap>
           </div>
@@ -315,17 +318,13 @@ export function HistoriaPage() {
               cardDistance={25}
               verticalDistance={25}
             >
-              <Card customClass={`${styles.historyCard} ${styles.iconCard}`}>
-                <FaAward size={50} />
-                <p>Brasil 1994 (FENCYT)</p>
+              <Card customClass={styles.historyCard}>
+                {/* --- ARREGLO 1 (USO): USANDO LA IMAGEN IMPORTADA --- */}
+                <img src={logros} alt="Logros" />
               </Card>
               <Card customClass={`${styles.historyCard} ${styles.iconCard}`}>
                 <FaFutbol size={50} />
                 <p>Campeones Regionales</p>
-              </Card>
-              <Card customClass={`${styles.historyCard} ${styles.iconCard}`}>
-                <FaFlask size={50} />
-                <p>Olimpiadas de Química</p>
               </Card>
             </CardSwap>
           </div>
@@ -351,16 +350,12 @@ export function HistoriaPage() {
                 {/* --- ARREGLO 1 (USO): USANDO LA OTRA IMAGEN IMPORTADA --- */}
                 <img src={fachadaActualImg} alt="Fachada Actual" />
               </Card>
-              <Card customClass={`${styles.historyCard} ${styles.iconCard}`}>
-                <FaTrophy size={50} />
-                <p>62 Años de Logros</p>
-              </Card>
             </CardSwap>
           </div>
           <div className={styles.timelineContent}>
-            <h2>62 Años y Contando</h2>
+            <h2>Más de 67 Años y Contando</h2>
             <p>
-              Son 62 años de imborrable actividad educativa. Gracias a los
+              Son más de 67 años de imborrable actividad educativa. Gracias a los
               logros, somos reconocidos como INSTITUCIÓN EMBLEMÁTICA por el
               Gobierno Regional y el Ministerio de Educación.
             </p>

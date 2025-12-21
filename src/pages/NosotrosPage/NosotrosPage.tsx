@@ -31,10 +31,10 @@ export function NosotrosPage() {
             </div>
             <h2>Nuestra Misión</h2>
             <p>
-              Brindar un servicio educativo integral en el nivel secundaria, 
-              promoviendo una formación basada en el pensamiento crítico y valores humanistas. 
-              Preparamos estudiantes que respetan la diversidad natural y cultural, 
-              listos para integrarse a la sociedad y resolver problemas con responsabilidad.
+              Somos una institución educativa que brinda un servicio educativo integral a estudiantes del nivel secundaria, 
+              promoviendo un estilo formativo basado en un modelo pedagógico socio crítico y humanista que permite a los 
+              estudiantes asumir principios y valores, destacando la responsabilidad y respeto a la diversidad natural, 
+              social y cultural en un contexto de crisis ambiental; para integrarse a la sociedad y resolver problemas esenciales de la vida.
             </p>
           </div>
         </ElectricBorder>
@@ -51,10 +51,12 @@ export function NosotrosPage() {
             </div>
             <h2>Nuestra Visión</h2>
             <p>
-              Ser una institución educativa líder, reconocida por el desarrollo 
-              afectivo, social y cognitivo de nuestros estudiantes. Aspiramos a ser un 
-              referente en prácticas pedagógicas innovadoras, formando ciudadanos 
-              comprometidos con una cultura democrática, ambiental y la mejora de nuestra comunidad.
+              Al año 2021, los estudiantes de la Institución Educativa “Ofelia Velásquez” han alcanzado niveles óptimos de desarrollo afectivo, 
+              social y cognitivo; asumiendo valores y compromisos hacia una cultura ciudadana democrática y ambiental. 
+              Docentes actualizados que demuestran buenas prácticas pedagógicas y padres de familia que asumen responsablemente su rol; 
+              siendo una institución educativa que mejora y moderniza la calidad de su servicio psicopedagógico.  
+              La infraestructura educativa es moderna con aulas, talleres y CRT, implementado con los últimos adelantos tecnológicos. 
+              Comprometidos en la mejora de la calidad de vida y las relaciones familiares en la comunidad.
             </p>
           </div>
         </ElectricBorder>
@@ -74,8 +76,8 @@ export function NosotrosPage() {
             <div className={styles.valorIcon}><BsPeople /></div>
             <h3 className={styles.valorTitle}>Solidaridad</h3>
             <p className={styles.valorDescription}>
-              Orientamos la práctica de la ayuda mutua, tomando como punto de 
-              partida la autoestima y la empatía.
+              Valor que permite orientar desde la práctica la ayuda mutua 
+              tomando como punto de partida la autoestima.
             </p>
           </SpotlightCard>
 
@@ -86,8 +88,10 @@ export function NosotrosPage() {
             <div className={styles.valorIcon}><BsHeart /></div>
             <h3 className={styles.valorTitle}>Respeto</h3>
             <p className={styles.valorDescription}>
-              Inculcamos el respeto a los derechos de los demás, al medio 
-              que nos rodea y a nuestra institución.
+              Inculcamos el respeto a los derechos de los demás, 
+              al medio que nos rodea y nos da vida, así como a las 
+              plantas y animales, a los símbolos patrios y la 
+              Institución Educativa.
             </p>
           </SpotlightCard>
 
@@ -99,7 +103,7 @@ export function NosotrosPage() {
             <h3 className={styles.valorTitle}>Justicia</h3>
             <p className={styles.valorDescription}>
               Nos inclinamos a dar a cada uno lo que le pertenece 
-              con derecho, razón y equidad en todo momento.
+              con derecho, razón y equidad.
             </p>
           </SpotlightCard>
 
@@ -110,8 +114,8 @@ export function NosotrosPage() {
             <div className={styles.valorIcon}><BsCheck2Square /></div>
             <h3 className={styles.valorTitle}>Responsabilidad</h3>
             <p className={styles.valorDescription}>
-              Valor fundamental que involucra el cumplimiento eficiente 
-              de los deberes de todos los agentes educativos.
+              Valor fundamental que involucra el cumplimiento de los 
+              deberes de todos los agentes educativos de manera eficiente.
             </p>
           </SpotlightCard>
         </div>
