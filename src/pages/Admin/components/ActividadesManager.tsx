@@ -8,7 +8,9 @@ const initialState = {
   titulo: '',
   descripcion: '',
   categoria: 'Cultural',
+  fecha: new Date().toISOString().split('T')[0],
 };
+
 
 export function ActividadesManager() {
   const [actividades, setActividades] = useState<Actividad[]>([]);
@@ -51,11 +53,17 @@ export function ActividadesManager() {
   const handleOpenForm = async (actividad?: Actividad) => {
     if (actividad) {
       setEditingId(actividad.id!);
-      setFormData({
-        titulo: actividad.titulo,
-        descripcion: actividad.descripcion,
-        categoria: actividad.categoria
+      const fechaBD = actividad.fecha_creacion
+  ? actividad.fecha_creacion.split(' ')[0]
+  : new Date().toISOString().split('T')[0];
+
+    setFormData({
+      titulo: actividad.titulo,
+      descripcion: actividad.descripcion,
+      categoria: actividad.categoria,
+      fecha: fechaBD,
       });
+
       setPreviewImage(getImageUrl(actividad.imagen_url));
       
       // Cargar galería
@@ -142,6 +150,20 @@ export function ActividadesManager() {
       {/* 2. FORMULARIO INCRUSTADO (className={styles.crudForm}) */}
       {isFormOpen && (
         <form onSubmit={handleSubmit} className={styles.crudForm}>
+          <div className={styles.formGroup}>
+  <label>Fecha del Evento:</label>
+  <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+    <input
+      type="date"
+      value={formData.fecha}
+      onChange={e =>
+        setFormData({ ...formData, fecha: e.target.value })
+      }
+      required
+    />
+  </div>
+</div>
+
              <h3 style={{marginTop:0, color:'var(--color-primary)', marginBottom:'1rem'}}>
                {editingId ? 'Editar Actividad' : 'Nueva Actividad'}
              </h3>
@@ -217,9 +239,11 @@ export function ActividadesManager() {
               <th>Categoría</th>
               <th>Stats</th>
               <th>Acciones</th>
+              <th>Fecha</th>
             </tr>
           </thead>
           <tbody>
+            
             {actividades.map((act) => (
               <tr key={act.id}>
                 <td>
@@ -234,6 +258,11 @@ export function ActividadesManager() {
                   <button onClick={() => handleOpenForm(act)} className={styles.editBtn}><BsPencil /></button>
                   <button onClick={() => handleDelete(act.id!)} className={styles.deleteBtn}><BsTrash /></button>
                 </td>
+                <td style={{ fontSize: '0.9rem' }}>
+                  {act.fecha_creacion
+                  ? new Date(act.fecha_creacion).toLocaleDateString()
+                  : '-'}
+                  </td>
               </tr>
             ))}
           </tbody>

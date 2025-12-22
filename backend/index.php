@@ -217,25 +217,26 @@ if ($route === 'actividades') {
     
 // 2. CREAR (POST sin ID)
     elseif ($method === 'POST' && !$id) {
-        // Guardar portada principal
         $imgPortada = guardarImagen($_FILES['imagen'] ?? null);
+        $fecha = $_POST['fecha'] ?? date('Y-m-d H:i:s'); // <--- RECIBIMOS LA FECHA
         
         try {
             $pdo->beginTransaction();
 
-            // A. Insertar Actividad
-            $sql = "INSERT INTO actividades (titulo, descripcion, categoria, imagen_url, fecha_creacion) VALUES (?, ?, ?, ?, NOW())";
+            // Insertamos la actividad CON la fecha
+            $sql = "INSERT INTO actividades (titulo, descripcion, categoria, imagen_url, fecha_creacion) VALUES (?, ?, ?, ?, ?)";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
                 $_POST['titulo'], 
                 $_POST['descripcion'] ?? '', 
                 $_POST['categoria'], 
-                $imgPortada
+                $imgPortada,
+                $fecha
             ]);
             
             $actividadId = $pdo->lastInsertId();
 
-            // B. Procesar Galería (Bucle blindado)
+            // Guardar Galería
             if (isset($_FILES['galeria']) && is_array($_FILES['galeria']['name'])) {
                 $sqlGaleria = "INSERT INTO actividades_galeria (actividad_id, imagen_url) VALUES (?, ?)";
                 $stmtGaleria = $pdo->prepare($sqlGaleria);
@@ -243,10 +244,7 @@ if ($route === 'actividades') {
                 $totalFiles = count($_FILES['galeria']['name']);
 
                 for ($i = 0; $i < $totalFiles; $i++) {
-                    // Verificamos que no haya error en la subida individual
                     if ($_FILES['galeria']['error'][$i] === UPLOAD_ERR_OK) {
-                        
-                        // Reconstruimos el array de archivo para la función guardarImagen
                         $archivoUnico = [
                             'name'     => $_FILES['galeria']['name'][$i],
                             'type'     => $_FILES['galeria']['type'][$i],
@@ -256,8 +254,6 @@ if ($route === 'actividades') {
                         ];
 
                         $nombreGuardado = guardarImagen($archivoUnico);
-                        
-                        // Solo insertamos si se guardó la imagen física
                         if ($nombreGuardado) {
                             $stmtGaleria->execute([$actividadId, $nombreGuardado]);
                         }
@@ -275,18 +271,18 @@ if ($route === 'actividades') {
         }
     }
 
-    // 3. EDITAR (POST con ID)
+// 3. EDITAR (POST con ID)
     elseif ($method === 'POST' && $id) {
         $img = guardarImagen($_FILES['imagen'] ?? null);
+        $fecha = $_POST['fecha'] ?? date('Y-m-d H:i:s'); // <--- RECIBIMOS LA FECHA
         
         try {
             $pdo->beginTransaction();
 
-            // Actualizar datos básicos
-            $sql = "UPDATE actividades SET titulo=?, descripcion=?, categoria=?";
-            $params = [$_POST['titulo'], $_POST['descripcion'] ?? '', $_POST['categoria']];
+            // Actualizamos título, desc, cat y FECHA
+            $sql = "UPDATE actividades SET titulo=?, descripcion=?, categoria=?, fecha_creacion=?";
+            $params = [$_POST['titulo'], $_POST['descripcion'] ?? '', $_POST['categoria'], $fecha];
             
-            // Si hay nueva portada, la actualizamos
             if ($img) {
                 $sql .= ", imagen_url=?";
                 $params[] = $img;
@@ -298,7 +294,7 @@ if ($route === 'actividades') {
             $stmt = $pdo->prepare($sql);
             $stmt->execute($params);
 
-            // Insertar nuevas fotos a la galería (se suman a las existentes)
+            // Agregar nuevas fotos a la galería
             if (isset($_FILES['galeria']) && is_array($_FILES['galeria']['name'])) {
                 $sqlGaleria = "INSERT INTO actividades_galeria (actividad_id, imagen_url) VALUES (?, ?)";
                 $stmtGaleria = $pdo->prepare($sqlGaleria);
@@ -316,7 +312,6 @@ if ($route === 'actividades') {
                         ];
 
                         $nombreGuardado = guardarImagen($archivoUnico);
-                        
                         if ($nombreGuardado) {
                             $stmtGaleria->execute([$id, $nombreGuardado]);
                         }
