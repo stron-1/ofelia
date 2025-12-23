@@ -1,10 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import styles from './DashboardPage.module.css';
-import { IMAGE_BASE_URL } from '../../api/apiClient';
+import { IMAGE_BASE_URL, apiClient } from '../../api/apiClient';
 import type { User } from '../../api/services/authService';
 // Usamos iconos para las notificaciones
 import { BsBell, BsGlobe, BsCheckCircleFill, BsEnvelopeFill, BsInfoCircleFill } from 'react-icons/bs';
+
+interface NotificacionesResponse {
+  comentarios: number | string;
+  mensajes: number | string;
+  total: number | string;
+}
 
 export function DashboardPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -13,6 +19,12 @@ export function DashboardPage() {
   // Estado para abrir/cerrar notificaciones
   const [showNotifications, setShowNotifications] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
+
+  const [notificaciones, setNotificaciones] = useState({
+    comentarios: 0,
+    mensajes: 0,
+    total: 0
+  });
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -41,6 +53,13 @@ export function DashboardPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // POLLING: Revisamos cada 5 SEGUNDOS (para que lo veas rápido)
+  useEffect(() => {
+    checkNotificaciones();
+    const intervalo = setInterval(checkNotificaciones, 5000); 
+    return () => clearInterval(intervalo);
+  }, []);
+
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   
   const handleLogout = () => {
@@ -48,6 +67,25 @@ export function DashboardPage() {
         localStorage.removeItem('authToken');
         localStorage.removeItem('user');
         navigate('/');
+    }
+  };
+
+  const checkNotificaciones = async () => {
+    try {
+      // Agregamos un timestamp para evitar caché del navegador
+      const data = await apiClient.get<NotificacionesResponse>('notificaciones', `&t=${Date.now()}`);
+      
+      console.log("Notificaciones recibidas:", data); // Mira la consola (F12) para ver si llega
+
+      if (data) {
+        setNotificaciones({
+          comentarios: Number(data.comentarios) || 0,
+          mensajes: Number(data.mensajes) || 0,
+          total: Number(data.total) || 0
+        });
+      }
+    } catch (error) {
+      console.error('Error buscando notificaciones', error);
     }
   };
 
@@ -115,11 +153,23 @@ export function DashboardPage() {
           <NavLink to="/admin/actividades" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>
             <span className="material-symbols-outlined">celebration</span>
             {isSidebarOpen && <span className={styles.linkText}>Actividades</span>}
+             {/* GLOBITO EN EL MENU LATERAL */}
+            {notificaciones.comentarios > 0 && isSidebarOpen && (
+               <span style={{marginLeft:'auto', background:'#dc3545', color:'white', fontSize:'0.7rem', padding:'2px 6px', borderRadius:'10px'}}>
+                 {notificaciones.comentarios}
+               </span>
+            )}
           </NavLink>
 
           <NavLink to="/admin/mensajes" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>
             <span className="material-symbols-outlined">mail</span>
             {isSidebarOpen && <span className={styles.linkText}>Mensajes</span>}
+             {/* GLOBITO EN EL MENU LATERAL */}
+             {notificaciones.mensajes > 0 && isSidebarOpen && (
+               <span style={{marginLeft:'auto', background:'#dc3545', color:'white', fontSize:'0.7rem', padding:'2px 6px', borderRadius:'10px'}}>
+                 {notificaciones.mensajes}
+               </span>
+            )}
           </NavLink>
         </nav>
         
@@ -141,7 +191,6 @@ export function DashboardPage() {
         
         <header className={styles.header}>
           
-          {/* IZQUIERDA: Toggle y Título */}
           <div className={styles.headerLeft}>
             <button onClick={toggleSidebar} className={styles.toggleBtn}>
               <span className="material-symbols-outlined">{isSidebarOpen ? 'menu_open' : 'menu'}</span>
@@ -149,15 +198,12 @@ export function DashboardPage() {
             <h2 className={styles.headerBreadcrumb}>{getPageTitle()}</h2>
           </div>
 
-          {/* DERECHA: Acciones (Sin buscador) */}
           <div className={styles.headerRight} ref={notifRef}>
             
-            {/* Botón Ver Web: target="_blank" OBLIGATORIO para no cerrar el admin */}
-            <a href="/" target="_blank" className={styles.headerIconBtn} title="Ver sitio web (Nueva pestaña)">
+            <a href="/" target="_blank" className={styles.headerIconBtn} title="Ver sitio web (Nueva pestaña)" rel="noreferrer">
               <BsGlobe />
             </a>
 
-            {/* Contenedor de Notificaciones */}
             <div style={{position: 'relative'}}>
               <button 
                 className={`${styles.headerIconBtn} ${showNotifications ? styles.activeBtn : ''}`} 
@@ -165,51 +211,108 @@ export function DashboardPage() {
                 title="Notificaciones"
               >
                 <BsBell />
-                <span className={styles.notificationDot}></span>
+                {notificaciones.total > 0 && (
+                  <span className={styles.notificationDot}></span>
+                )}
               </button>
 
-              {/* DROPDOWN DE NOTIFICACIONES (TIPO INSTAGRAM) */}
+              {/* DROPDOWN DE NOTIFICACIONES */}
               {showNotifications && (
                 <div className={styles.notificationDropdown}>
                   <div className={styles.notifHeader}>
                     <h4>Notificaciones</h4>
-                    <span>Marcar leídas</span>
+                    <span 
+                      onClick={async () => {
+                        // 1. Decimos al backend que marque todo como leído
+                        await apiClient.post('notificaciones', { tipo: 'mensajes' });
+                        
+                        // 2. Bajamos el contador a 0 visualmente rápido
+                        setNotificaciones(prev => ({ 
+                          ...prev, 
+                          mensajes: 0, 
+                          total: Number(prev.total) - Number(prev.mensajes) 
+                        }));
+                        
+                        // 3. Recargamos datos reales
+                        checkNotificaciones();
+                      }} 
+                      style={{ cursor: 'pointer', fontSize: '0.8rem', color: '#0d6efd', fontWeight: 'bold' }}
+                    >
+                      Marcar leídas
+                    </span>
                   </div>
                   
                   <div className={styles.notifList}>
-                    {/* Item 1 */}
-                    <div className={styles.notifItem}>
-                      <div className={`${styles.notifIconBox} ${styles.blue}`}>
-                        <BsCheckCircleFill />
+                    {/* CASO VACÍO */}
+                    {notificaciones.total === 0 && (
+                      <div style={{ padding: '20px', textAlign: 'center', color: '#999' }}>
+                        <BsCheckCircleFill size={22} />
+                        <p style={{ marginTop: '8px', fontSize: '0.9rem' }}>
+                          Todo está al día
+                        </p>
                       </div>
-                      <div className={styles.notifContent}>
-                        <p className={styles.notifText}><strong>Actividad Creada</strong> se publicó correctamente en la web.</p>
-                        <span className={styles.notifTime}>Hace 2 min</span>
+                    )}
+                    
+                   {/* ITEM: COMENTARIOS */}
+                    {notificaciones.comentarios > 0 && (
+                      <div 
+                        className={styles.notifItem} 
+                        onClick={async () => { 
+                           // 1. Avisamos al backend que ya los vimos
+                           await apiClient.post('notificaciones', { tipo: 'comentarios' });
+                           
+                           // 2. Bajamos el contador visualmente al instante
+                           setNotificaciones(prev => ({ 
+                             ...prev, 
+                             comentarios: 0, 
+                             total: Number(prev.total) - Number(prev.comentarios) 
+                           }));
+                           
+                           // 3. Navegamos
+                           setShowNotifications(false); 
+                           navigate('/admin/actividades'); 
+                        }}
+                      >
+                        <div className={`${styles.notifIconBox} ${styles.blue}`}>
+                          <BsInfoCircleFill />
+                        </div>
+                        <div className={styles.notifContent}>
+                          <p className={styles.notifText}>
+                            <strong>{notificaciones.comentarios}</strong> comentarios pendientes
+                          </p>
+                          <span className={styles.notifTime}>Clic para revisar</span>
+                        </div>
                       </div>
-                    </div>
+                    )}
 
-                    {/* Item 2 */}
-                    <div className={styles.notifItem}>
-                       <div className={`${styles.notifIconBox} ${styles.orange}`}>
-                        <BsEnvelopeFill />
+                    {/* ITEM: MENSAJES */}
+                    {notificaciones.mensajes > 0 && (
+                      <div 
+                        className={styles.notifItem} 
+                        onClick={async () => { 
+                           // 1. Llamamos al backend para marcar leídos
+                           await apiClient.post('notificaciones', { tipo: 'mensajes' });
+                           // 2. Actualizamos el contador visualmente al instante
+                           setNotificaciones(prev => ({ ...prev, mensajes: 0, total: Number(prev.total) - Number(prev.mensajes) }));
+                           // 3. Cerramos y navegamos
+                           setShowNotifications(false); 
+                           navigate('/admin/mensajes'); 
+                        }}
+                      >
+                        <div className={`${styles.notifIconBox} ${styles.orange}`}>
+                          <BsEnvelopeFill />
+                        </div>
+                        <div className={styles.notifContent}>
+                          <p className={styles.notifText}>
+                            <strong>{notificaciones.mensajes}</strong> mensajes nuevos
+                          </p>
+                          <span className={styles.notifTime}>Haz clic para leerlos</span>
+                        </div>
                       </div>
-                      <div className={styles.notifContent}>
-                        <p className={styles.notifText}><strong>Nuevo Mensaje</strong> de un padre de familia.</p>
-                        <span className={styles.notifTime}>Hace 1 hora</span>
-                      </div>
-                    </div>
+                    )}
+                  </div> 
+                  {/* CIERRE CORRECTO DE notifList */}
 
-                    {/* Item 3 */}
-                    <div className={styles.notifItem}>
-                       <div className={`${styles.notifIconBox} ${styles.green}`}>
-                        <BsInfoCircleFill />
-                      </div>
-                      <div className={styles.notifContent}>
-                        <p className={styles.notifText}>Sistema actualizado a la versión 2.0</p>
-                        <span className={styles.notifTime}>Ayer</span>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               )}
             </div>

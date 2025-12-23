@@ -521,54 +521,41 @@ if ($route === 'actividades') {
 // --- RUTA: INTERACCIONES SOCIALES (LIKES Y COMENTARIOS) ---
     elseif ($route === 'social') {
         
-        // 1. LEER DATOS JSON (IMPORTANTE: Esto faltaba)
         $json = json_decode(file_get_contents('php://input'), true);
 
-        // A. DAR LIKE (Público)
+        // A. DAR LIKE
         if ($method === 'POST' && isset($_GET['accion']) && $_GET['accion'] === 'like') {
-            // Buscamos el ID en el JSON ($json), en POST normal o en la URL
             $actividad_id = $json['id'] ?? $_POST['id'] ?? $_GET['id'] ?? null;
-            
             if ($actividad_id) {
-                // Actualizamos
                 $stmt = $pdo->prepare("UPDATE actividades SET likes = likes + 1 WHERE id = ?");
                 $stmt->execute([$actividad_id]);
-                
-                // Devolvemos el dato actualizado para que el frontend no mienta
                 $stmt = $pdo->prepare("SELECT likes FROM actividades WHERE id = ?");
                 $stmt->execute([$actividad_id]);
-                $nuevo_total = $stmt->fetch()['likes'];
-                
-                echo json_encode(["message" => "Like agregado", "likes" => $nuevo_total]);
+                echo json_encode(["message" => "Like agregado", "likes" => $stmt->fetch()['likes']]);
             } else {
-                http_response_code(400);
-                echo json_encode(["error" => "No se recibió el ID de la actividad"]);
+                http_response_code(400); echo json_encode(["error" => "Falta ID"]);
             }
         }
 
-        // B. PUBLICAR COMENTARIO (Público - Estado Pendiente)
+        // B. PUBLICAR COMENTARIO
         elseif ($method === 'POST' && isset($_GET['accion']) && $_GET['accion'] === 'comentar') {
-            // Leemos del JSON primero (Frontend suele enviar JSON) o de POST
             $actividad_id = $json['actividad_id'] ?? $_POST['actividad_id'] ?? null;
-            $autor        = $json['autor'] ?? $_POST['autor'] ?? 'Anónimo';
-            $contenido    = $json['contenido'] ?? $_POST['contenido'] ?? '';
+            $autor = $json['autor'] ?? $_POST['autor'] ?? 'Anónimo';
+            $contenido = $json['contenido'] ?? $_POST['contenido'] ?? '';
 
             if ($actividad_id && !empty($contenido)) {
                 $stmt = $pdo->prepare("INSERT INTO comentarios (actividad_id, autor, contenido, estado, fecha) VALUES (?, ?, ?, 'pendiente', NOW())");
                 $stmt->execute([$actividad_id, $autor, $contenido]);
                 echo json_encode(["message" => "Comentario enviado a moderación"]);
             } else {
-                http_response_code(400);
-                echo json_encode(["error" => "Faltan datos (ID o Contenido)"]);
+                http_response_code(400); echo json_encode(["error" => "Faltan datos"]);
             }
         }
 
-        // C. OBTENER COMENTARIOS APROBADOS (Público)
+        // C. OBTENER COMENTARIOS APROBADOS
         elseif ($method === 'GET' && isset($_GET['actividad_id'])) {
-            $act_id = $_GET['actividad_id'];
-            $sql = "SELECT id, autor, contenido, fecha FROM comentarios WHERE actividad_id = ? AND estado = 'aprobado' ORDER BY fecha DESC";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([$act_id]);
+            $stmt = $pdo->prepare("SELECT id, autor, contenido, fecha FROM comentarios WHERE actividad_id = ? AND estado = 'aprobado' ORDER BY fecha DESC");
+            $stmt->execute([$_GET['actividad_id']]);
             echo json_encode($stmt->fetchAll());
         }
 
@@ -589,12 +576,55 @@ if ($route === 'actividades') {
                 http_response_code(400); echo json_encode(["error" => "Falta ID"]);
             }
         }
-        
+
         // F. GESTIÓN ADMIN: Rechazar/Borrar
         elseif ($method === 'DELETE' && $id) {
             $stmt = $pdo->prepare("DELETE FROM comentarios WHERE id = ?");
             $stmt->execute([$id]);
             echo json_encode(["message" => "Comentario eliminado"]);
+        }
+
+    }
+
+// --- RUTA: NOTIFICACIONES ---
+    elseif ($route === 'notificaciones') {
+        
+        // 1. OBTENER CONTEO (GET)
+        if ($method === 'GET') {
+            // CAMBIO CLAVE: Contamos solo los pendientes que NO han sido vistos (visto = 0)
+            $sqlCom = "SELECT COUNT(*) as total FROM comentarios WHERE estado = 'pendiente' AND visto = 0";
+            $stmtCom = $pdo->query($sqlCom);
+            $numComentarios = $stmtCom->fetch()['total'];
+
+            // Contar Mensajes No Leídos
+            $sqlMsj = "SELECT COUNT(*) as total FROM mensajes_contacto WHERE leido = 0";
+            $stmtMsj = $pdo->query($sqlMsj);
+            $numMensajes = $stmtMsj->fetch()['total'];
+
+            echo json_encode([
+                'comentarios' => $numComentarios,
+                'mensajes' => $numMensajes,
+                'total' => $numComentarios + $numMensajes
+            ]);
+            exit;
+        }
+        
+        // 2. MARCAR COMO LEÍDO/VISTO (POST)
+        elseif ($method === 'POST') {
+            $data = json_decode(file_get_contents('php://input'), true);
+            $tipo = $data['tipo'] ?? '';
+
+            if ($tipo === 'mensajes') {
+                // Marca mensajes como leídos
+                $pdo->query("UPDATE mensajes_contacto SET leido = 1 WHERE leido = 0");
+                echo json_encode(["message" => "Mensajes marcados"]);
+            } 
+            elseif ($tipo === 'comentarios') {
+                // NUEVO: Marca comentarios como vistos (aunque sigan pendientes)
+                $pdo->query("UPDATE comentarios SET visto = 1 WHERE estado = 'pendiente' AND visto = 0");
+                echo json_encode(["message" => "Comentarios marcados como vistos"]);
+            }
+            exit;
         }
     }
 ?>
